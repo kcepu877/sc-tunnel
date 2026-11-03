@@ -1,0 +1,45 @@
+# ===== Secrets / credentials =====
+*.key
+*.pem
+*.crt
+bot.key
+client.id
+backup.pass
+rclone.conf
+.env
+.env.*
+
+# ===== Runtime / generated data =====
+backup-*.zip
+*.log
+/tmp/
+.dns
+.ip
+.system
+
+# ===== Archives / build artifacts =====
+*.zip
+*.tar
+*.tar.gz
+*.tar.bz2
+!bin/
+!bin/*.tar.gz
+!bin/*.sha256
+!bin/checksums.txt
+api-tester/*
+main.zip
+
+# ===== OS / editor cruft =====
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+
+# ===== Temp helper scripts =====
+_*.sh
+_*.ps1
+_*.txt
