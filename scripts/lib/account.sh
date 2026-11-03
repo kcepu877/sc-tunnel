@@ -38,6 +38,8 @@ acc_xray_create() {
     err "failed to write database"; return 1
   fi
   db_audit "create" "$proto" "$user" "quota=${quota_gb}GB ip=${limit_ip}"
+  # NOTIF TELE
+  tg_notify_new_account "$proto" "$user" "$(( (exp_epoch - $(date +%s)) / 86400 )) hari" "$secret" "$quota_gb" "$limit_ip"
   systemctl restart xray.service >/dev/null 2>&1
   return 0
 }
@@ -111,6 +113,8 @@ acc_ssh_create() {
   fi
   db_insert_account "ssh" "$user" "$pass" "$quota_bytes" "$limit_ip" "$exp_epoch"
   db_audit "create" "ssh" "$user" "ip=${limit_ip} days=${days} quota=${quota_gb}GB"
+  # NOTIF TELE
+  tg_notify_new_account "ssh" "$user" "$days hari" "$pass" "$quota_gb" "$limit_ip"
   return 0
 }
 
@@ -235,6 +239,8 @@ acc_noobz_create() {
 
   db_insert_account "noobz" "$user" "$pass" "$quota_bytes" "$limit_dev" "$exp_epoch"
   db_audit "create" "noobz" "$user" "devices=${limit_dev} days=${days} quota=${quota_gb}GB"
+    # NOTIF TELE
+  tg_notify_new_account "noobz" "$user" "$days hari" "$pass" "$quota_gb" "$limit_dev"
   return 0
 }
 
@@ -759,3 +765,7 @@ xray_cek_monitor() {
   [[ $any -eq 0 ]] && echo -e " ${YELLOW}No ${proto^^} users with active connections.${NC}"
   ui_foot
 }
+
+
+  
+  
