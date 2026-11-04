@@ -1838,7 +1838,13 @@ fi
 haproxy_install_logic() {
   print_info "Configuring HAProxy Enterprise Balancing..."
   dnf install haproxy -y >/dev/null 2>&1
-
+  
+  sudo mkdir -p /etc/systemd/system/haproxy.service.d
+sudo tee /etc/systemd/system/haproxy.service.d/20-runtime-dir.conf > /dev/null <<'EOF'
+[Service]
+RuntimeDirectory=haproxy
+RuntimeDirectoryMode=0750
+EOF
   mkdir -p /etc/haproxy /run/haproxy
   cat /etc/xray/xray.crt /etc/xray/xray.key | tee /etc/haproxy/haproxy.pem >/dev/null
   chmod 600 /etc/haproxy/haproxy.pem
