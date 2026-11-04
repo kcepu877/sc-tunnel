@@ -2145,10 +2145,10 @@ User=root
 WantedBy=multi-user.target
 EOF
 
-systemctl daemon-reload
-systemctl enable quota-ssh quota limit-ip-vless --now
-systemctl enable quota-trojan limit-ip-trojan --now
-systemctl enable quota-vmess limit-ip-vmess --now
+systemctl daemon-reload >/dev/null 2>&1
+systemctl enable quota-ssh quota limit-ip-vless --now >/dev/null 2>&1
+systemctl enable quota-trojan limit-ip-trojan --now >/dev/null 2>&1
+systemctl enable quota-vmess limit-ip-vmess --now >/dev/null 2>&1
 for svc in quota-ssh quota limit-ip-vless quota-trojan limit-ip-trojan quota-vmess limit-ip-vmess; do
   check_service "$svc" || print_warn "Looping service '$svc' not active (will retry via Restart=on-failure)."
 done
@@ -2166,7 +2166,7 @@ api_server_install_logic() {
   # Fallback manual install
   if ! command -v go &>/dev/null; then
     print_info "Installing Go..."
-    dnf install -y golang
+    dnf install -y golang >/dev/null 2>&1
   fi
 
   API_DIR="${script_dir}/files"
@@ -2191,8 +2191,8 @@ api_server_install_logic() {
 
   cp "$API_DIR/api-server.service" /etc/systemd/system/api-server.service
   chmod 644 /etc/systemd/system/api-server.service
-  systemctl daemon-reload
-  systemctl enable api-server --now
+  systemctl daemon-reload >/dev/null 2>&1
+  systemctl enable api-server --now >/dev/null 2>&1
 
   local token; token=$(sqlite3 /etc/api/api.db "SELECT token FROM tokens LIMIT 1;" 2>/dev/null || true)
   [[ -z "$token" && -f /etc/api/key ]] && token=$(cat /etc/api/key)
@@ -2291,7 +2291,7 @@ ovpn_install_logic() {
   echo "=================================================="
   WEB_DIR="/var/www/html/kcepu877/openvpn"
   EASYRSA_DIR="/etc/openvpn/easy-rsa"
-  dnf install -y openvpn easy-rsa
+  dnf install -y openvpn easy-rsa >/dev/null 2>&1
   dnf install -y iptables-nft >/dev/null 2>&1 || dnf install -y iptables-services >/dev/null 2>&1 || true
   mkdir -p $WEB_DIR
   mkdir -p $EASYRSA_DIR
@@ -2410,13 +2410,14 @@ EOF
   # Routing & Firewall
   echo 1 >/proc/sys/net/ipv4/ip_forward
   sed -i 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
-  sysctl -p
-  firewall-cmd --zone=public --add-port=1194/tcp --permanent
-  firewall-cmd --add-masquerade --permanent
-  firewall-cmd --reload
+  sysctl -p >/dev/null 2>&1
+  firewall-cmd --zone=public --add-port=1194/tcp --permanent >/dev/null 2>&1 || true
+  firewall-cmd --add-masquerade --permanent >/dev/null 2>&1 || true
+  firewall-cmd --reload >/dev/null 2>&1 || true
 
-  systemctl enable openvpn-server@server-tcp-1194
-  systemctl restart openvpn-server@server-tcp-1194
+
+  systemctl enable openvpn-server@server-tcp-1194 >/dev/null 2>&1
+  systemctl restart openvpn-server@server-tcp-1194 >/dev/null 2>&1
   check_service "openvpn-server@server-tcp-1194" || print_warn "OpenVPN TCP not active."
 }
 
