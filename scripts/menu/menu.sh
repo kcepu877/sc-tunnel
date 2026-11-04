@@ -218,7 +218,7 @@ ui_opt2 3 "VMESS"         9 "API Menu"
 ui_opt2 4 "TROJAN"       10 "System Menu"
 ui_opt2 5 "NoobzVPN"     11 "Backup / Restore"
 ui_opt2 6 "Auto Bulk"    00 "Change banner"
-ui_opt2 x "Exit"           xx "REBOOT"
+ui_opt2 u "update"           xx "REBOOT"
 ui_rule
 ui_center "$xray_version"
 ui_foot
@@ -240,6 +240,7 @@ case $mm in
 11) clear ; run_cc ; menu-backup ;;
 12) clear ; run_cc ; menu-rdns ;;
 xx) clear ; reboot ;;
+x|X) clear ; exit 0 ;;
 u|U|update) clear ; run_cc ; update ;;
 00) clear ; run_cc ; change-banner ;;
 *) echo "Invalid option, please try again." ; sleep 1 ; menu ;;
