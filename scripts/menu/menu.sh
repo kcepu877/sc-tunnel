@@ -240,7 +240,7 @@ case $mm in
 11) clear ; run_cc ; menu-backup ;;
 12) clear ; run_cc ; menu-rdns ;;
 xx) clear ; reboot ;;
-x|X) clear ; exit 0 ;;
+u|U|update) clear ; run_cc ; update ;;
 00) clear ; run_cc ; change-banner ;;
 *) echo "Invalid option, please try again." ; sleep 1 ; menu ;;
 esac
