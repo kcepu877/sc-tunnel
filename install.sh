@@ -246,7 +246,7 @@ sleep 1
 enable_el_repositories
 
 print_info "Installing core dependencies..."
-dnf install -y wget curl openssl sudo binutils coreutils gnupg2 bc htop lsof jq sqlite tar gzip bzip2 xz unzip python3 util-linux policycoreutils policycoreutils-python-utils
+dnf install -y wget curl openssl sudo binutils coreutils gnupg2 bc htop lsof jq sqlite tar gzip bzip2 xz unzip python3 util-linux policycoreutils policycoreutils-python-utils >/dev/null 2>&1
 dnf install -y vnstat ruby rubygems >/dev/null 2>&1 || true
 command -v gem >/dev/null 2>&1 && gem install lolcat >/dev/null 2>&1 || true
 if systemctl list-unit-files vnstat.service >/dev/null 2>&1; then
@@ -299,8 +299,8 @@ if [[ -f /etc/ssh/sshd_config ]]; then
   sed -i 's/^#*PasswordAuthentication.*/PasswordAuthentication yes/g' /etc/ssh/sshd_config
   sed -i 's/^#*PermitRootLogin.*/PermitRootLogin yes/g' /etc/ssh/sshd_config
 fi
-systemctl daemon-reload
-systemctl restart sshd
+systemctl daemon-reload >/dev/null 2>&1
+systemctl restart sshd >/dev/null 2>&1
 print_success "OpenSSH hardened & active on ports 22 and 3303."
 
 # Register the nologin shell so PAM (pam_shells) accepts tunneling accounts.
@@ -318,12 +318,12 @@ print_success "nologin shell registered."
 # login-checker scripts (which read /var/log/secure) and the ssh-ws auth-log
 # monitor get no data. Dropbear logs via syslog (authpriv) once -E is dropped.
 print_info "Configuring rsyslog for /var/log/secure..."
-dnf install rsyslog -y
+dnf install rsyslog -y >/dev/null 2>&1
 if ! grep -rqs 'authpriv\.\*' /etc/rsyslog.conf /etc/rsyslog.d/ 2>/dev/null; then
   echo 'authpriv.*    /var/log/secure' >/etc/rsyslog.d/00-sc-tunnel-secure.conf
 fi
-systemctl enable rsyslog --now
-systemctl restart rsyslog
+systemctl enable rsyslog --now >/dev/null 2>&1
+systemctl restart rsyslog >/dev/null 2>&1
 print_success "rsyslog active (authpriv -> /var/log/secure)."
 
 # Make A Directory
@@ -343,7 +343,7 @@ REPO_TARBALL="https://github.com/${REPO_OWNER}/${REPO_NAME}/archive/refs/heads/$
 
 menu_install_logic() {
   print_info "Downloading management menu..."
-  dnf install tar gzip -y
+  dnf install tar gzip -y >/dev/null 2>&1
 
   local tmpdir
   tmpdir=$(mktemp -d)
@@ -392,10 +392,17 @@ menu_install_logic() {
     install -m 0755 "$srcdir/scripts/build/build-dropbear-2019.sh" /usr/local/share/sc-tunnel/build/build-dropbear-2019.sh
   fi
 
-  # Install the API & Uninstaller helper commands
-  [[ -f "$srcdir/install-api.sh" ]] && install -m 0755 "$srcdir/install-api.sh" /usr/local/sbin/install-api
+  # Install the API, Uninstaller & Updater helper commands[[ -f "$srcdir/install-api.sh" ]] && install -m 0755 "$srcdir/install-api.sh" /usr/local/sbin/install-api
   [[ -f "$srcdir/uninstall-api.sh" ]] && install -m 0755 "$srcdir/uninstall-api.sh" /usr/local/sbin/uninstall-api
   [[ -f "$srcdir/uninstall.sh" ]] && install -m 0755 "$srcdir/uninstall.sh" /usr/local/sbin/uninstall
+  if [[ -f "$srcdir/update.sh" ]]; then
+    install -m 0755 "$srcdir/update.sh" /usr/local/sbin/update
+  elif [[ -f "$srcdir/scripts/system/update.sh" ]]; then
+    install -m 0755 "$srcdir/scripts/system/update.sh" /usr/local/sbin/update
+  fi
+  ln -sf /usr/local/sbin/update /usr/local/sbin/update-script 2>/dev/null || true
+  ln -sf /usr/local/sbin/update /usr/local/sbin/autoscript-update 2>/dev/null || true
+  [[ -f "$srcdir/VERSION" ]] && cp -f "$srcdir/VERSION" /usr/local/sbin/VERSION 2>/dev/null || true
 
   rm -rf "$tmpdir"
   print_success "Menu scripts and libraries integrated."
@@ -2003,8 +2010,8 @@ Persistent=true
 WantedBy=timers.target
 EOF
 
-systemctl daemon-reload
-systemctl enable --now autoexpire.timer limit-ip-ssh.timer backup.timer fixlog.timer
+systemctl daemon-reload >/dev/null 2>&1
+systemctl enable --now autoexpire.timer limit-ip-ssh.timer backup.timer fixlog.timer >/dev/null 2>&1
 
 # Install Speedtest CLI securely (direct HTTPS archive, zero curl|bash repo script)
 install_speedtest_secure() {
