@@ -2603,4 +2603,18 @@ SELF="$(readlink -f "$0" 2>/dev/null)"
 cd /root 2>/dev/null
 [[ -n "$SELF" && -f "$SELF" ]] && rm -f "$SELF" 2>/dev/null
 rm -f /root/install.sh /root/uninstall.sh 2>/dev/null
-exit 0
+cat >>/root/.bashrc <<'EOF'
+
+# Auto-launch menu on first login
+if [[ $- == *i* ]] && [[ -z "$AUTO_MENU_LAUNCHED" ]]; then
+    export AUTO_MENU_LAUNCHED=1
+    if [[ -x /usr/local/sbin/menu ]]; then
+        /usr/local/sbin/menu
+    fi
+fi
+EOF
+
+# Sync filesystem & beri waktu 5 detik sebelum reboot
+sync
+sleep 5
+reboot
