@@ -1668,8 +1668,8 @@ server {
 
 # Dedicated HTTP/2 server block for gRPC, XHTTP, and HTTPUpgrade
 server {
-    listen 127.0.0.1:82 default_server proxy_protocol;
-    http2 on;
+    listen 127.0.0.1:82 default_server proxy_protocol http2;
+    
     server_name ${domain};
 
     # gRPC inbounds
