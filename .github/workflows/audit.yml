@@ -18,8 +18,7 @@ jobs:
       - name: Syntax Check All Shell Scripts (bash -n)
         run: |
           echo "Auditing shell script syntax..."
-          find . -type f -name "*.sh" -exec bash -n {} +
-          bash -n install.sh
+          find . -type f -name "*.sh" -exec bash -n {} \;          bash -n install.sh
           bash -n uninstall.sh
           bash -n install-api.sh
           echo "All shell scripts passed syntax validation successfully!"
