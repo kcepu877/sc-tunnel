@@ -550,7 +550,7 @@ _vmess_link() {
 # in vless/trojan links was causing the API to reject the message).
 # Args: proto user secret domain quota_disp ip_disp exp_disp [title]
 xray_tg_text() {
-  local proto="$1" user="$2" secret="$3" domain="$4" quota_disp="$5" ip_disp="$6" exp_disp="$7" title="$8"
+  local proto="$1" user="$2" secret="$3" domain="$4" quota_disp="$5" ip_disp="$6" exp_disp="$7"
   local eu ed es eq ei ex link1 link2
   eu=$(html_escape "$user");       ed=$(html_escape "$domain")
   es=$(html_escape "$secret");     eq=$(html_escape "$quota_disp")
