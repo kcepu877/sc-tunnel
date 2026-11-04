@@ -119,7 +119,7 @@ curl -fsSL --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/kcepu877
 
 ### 1-Line Update / Upgrade Command
 ```bash
-curl -fsSL --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/risqinf/autoscript/main/update.sh | bash
+curl -fsSL --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/kcepu877/sc-tunnel/main/update.sh | bash
 ```
 
 ---
