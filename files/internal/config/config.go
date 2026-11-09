@@ -12,7 +12,7 @@ import (
 	"strings"
 )
 
-// Config holds application configuration for Autoscript Enterprise API v5.6.0.
+// Config holds application configuration for Autoscript Enterprise API v5.6.1.
 type Config struct {
 	// Server
 	ListenAddress  string
@@ -95,8 +95,8 @@ func Load() (*Config, error) {
 		XrayAccessLog:    getEnv("XRAY_ACCESS_LOG", "/var/log/xray/access.log"),
 		XrayAPIAddress:   getEnv("XRAY_API", "127.0.0.1:10085"),
 		SSHWSAPI:         strings.TrimRight(getEnv("SSH_WS_API", "http://127.0.0.1:8081"), "/"),
-		DNSLogFile:       getEnv("DNS_LOG_FILE", "/var/log/sc-tunnel-dns.log"),
-		GeoIPCacheFile:   getEnv("GEOIP_CACHE_FILE", "/run/sc-tunnel-geoip.cache"),
+		DNSLogFile:       getEnv("DNS_LOG_FILE", "/var/log/autoscript-dns.log"),
+		GeoIPCacheFile:   getEnv("GEOIP_CACHE_FILE", "/run/autoscript-geoip.cache"),
 		BackupKeyFile:    getEnv("BACKUP_KEY_FILE", "/etc/xray/backup.pass"),
 		ChatIDFile:       getEnv("CHATID_FILE", "/etc/xray/client.id"),
 		RateLimit:        getEnvInt("RATE_LIMIT", 5000),
