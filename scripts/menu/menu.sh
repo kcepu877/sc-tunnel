@@ -9,7 +9,7 @@
 [[ -f /usr/local/sbin/lib/db.sh ]] && . /usr/local/sbin/lib/db.sh && db_init 2>/dev/null
 
 # --- Color Definitions ---
-NC='\033[0m' # No Color
+NC='\033[0m'
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -19,6 +19,7 @@ PURPLE='\033[1;35m'
 LIGHT='\033[0;37m'
 BICyan='\033[1;96m'
 BIWhite='\033[1;97m'
+PINK='\033[1;95m'
 
 # --- Function: Delete All Recovery data ---
 delall() {
@@ -144,7 +145,6 @@ tro=$(db_query "SELECT COUNT(*) FROM accounts WHERE protocol='trojan' AND status
 nbz=$(db_query "SELECT COUNT(*) FROM accounts WHERE protocol='noobz' AND status!='deleted';" 2>/dev/null); nbz=${nbz:-0}
 
 # --- SERVICE STATUS (uses shared badges from common.sh) ---
-# SSH tunnel = dropbear + ssh-ws together (3-state: ON/WARN/OFF).
 resshws=$(ssh_stack_badge)
 resngx=$(svc_badge nginx)
 resv2r=$(svc_badge xray)
@@ -171,14 +171,8 @@ IPVPS=$(curl -s --max-time 3 ifconfig.me 2>/dev/null || echo "N/A")
 
 
 # --- MAIN MENU ---
-SCRIPT_VER="5.6.1"
-if [[ -f /usr/local/sbin/VERSION ]]; then
-  SCRIPT_VER=$(tr -d '[:space:]' < /usr/local/sbin/VERSION)
-fi
-
 clear
-ui_header "ENTERPRISE VPN MANAGER (v${SCRIPT_VER})"
-ui_kv "Version"  "v${SCRIPT_VER}" "$GREEN"
+ui_header "ENTERPRISE VPN MANAGER"
 ui_kv "OS"       "$OS1"
 ui_kv "IP"       "$IPVPS"
 ui_kv "Domain"   "$DOMAIN"
@@ -189,39 +183,49 @@ ui_kv "Traffic"  "$ttoday / $tyest / $tmon  (day/yest/mon)"
 ui_rule
 printf " ${WHITE}%-12s${NC} ${CYAN}:${NC} SSH ${PINK}[${GREEN}%s${PINK}]${NC}  VLESS ${PINK}[${GREEN}%s${PINK}]${NC}  VMESS ${PINK}[${GREEN}%s${PINK}]${NC}  TROJAN ${PINK}[${GREEN}%s${PINK}]${NC}  NOOBZ ${PINK}[${GREEN}%s${PINK}]${NC}\n" "Accounts" "$ssh1" "$vls" "$vms" "$tro" "$nbz"
 ui_rule
-ui_label "SERVICES"
-ui_status "SSH + WS"  "$resshws"
-[[ -s /etc/slowdns/server.pub ]] && ui_status "SlowDNS"   "$(svc_badge slowdns)"
-ui_status "Xray Core" "$resv2r"
-ui_status "Nginx"     "$resngx"
-ui_status "HAProxy"   "$reshap"
-ui_status "OpenVPN"   "$resovpn"
-ui_status "Squid"     "$ressquid"
-[[ -x /usr/bin/noobzvpns ]] && ui_status "NoobzVPN" "$resnbz"
-ui_status "API"       "$resapi"
-[[ -f /etc/rdns/client.yaml ]] && ui_status "RDNS Tunnel" "$(svc_badge rdns-client)"
+
+# 3-kolom status
+ui_status3() {
+  local n1="$1" b1="$2" n2="$3" b2="$4" n3="$5" b3="$6"
+  printf " ${WHITE}%-10s${NC} ${CYAN}:${NC} %-12b ${WHITE}%-10s${NC} ${CYAN}:${NC} %-12b ${WHITE}%-10s${NC} ${CYAN}:${NC} %b\n" \
+    "$n1" "$b1" "$n2" "$b2" "$n3" "$b3"
+}
+ui_header "SERVICES"
 ui_rule
-ui_label "ACCOUNT PANELS"
-ui_opt 1 "SSH / OpenVPN Panel"
-ui_opt 2 "VLESS Panel (WS/HU/XHTTP/gRPC)"
-ui_opt 3 "VMESS Panel (WS/HU/XHTTP/gRPC)"
-ui_opt 4 "TROJAN Panel (WS/HU/XHTTP/gRPC)"
-ui_opt 5 "NoobzVPN Panel (TCP/WS)"
+ui_status3 "SSH + WS" "$resshws" "Xray Core" "$resv2r"  "Nginx"    "$resngx"
+ui_status3 "HAProxy"  "$reshap"  "OpenVPN"   "$resovpn" "Squid"    "$ressquid"
+ui_status3 "NoobzVPN" "$resnbz"  "API"       "$resapi"  "SlowDNS"  "$(svc_badge slowdns)"
+#ui_status3 "RDNS"     "$(svc_badge rdns-client)" "" "" "" ""
+
 ui_rule
-ui_label "TOOLS"
-ui_opt 6 "Auto Bulk Create"
-ui_opt 7 "Account Cleaner"
-ui_opt 8 "User Checker"
-ui_opt 9 "API Menu"
+# 2-kolom option
+ui_opt2() {
+  local ln="$1" lt="$2" rn="$3" rt="$4"
+  printf "  ${PINK}(•%2s)${NC} ${WHITE}│${NC} %-25b ${PINK}(•%2s)${NC} ${WHITE}│${NC} %b\n" \
+    "$ln" "$lt" "$rn" "$rt"
+}
+# Center ke tengah layar
+ui_center_full() {
+  local t="$1"
+  local w=$(tput cols 2>/dev/null || echo 80)
+  local pad=$(( (w - ${#t}) / 2 ))
+  (( pad < 0 )) && pad=0
+  printf "${WHITE}%*s%s${NC}\n" "$pad" "" "$t"
+}
+ui_header "ACCOUNT PANELS & TOOLS"
 ui_rule
-ui_label "SERVER"
-ui_opt 10 "System Menu"
-ui_opt 11 "Backup / Restore"
-ui_opt 12 "RDNS Client (mTLS Stealth Tunnel)"
-ui_opt x  "Exit"
+ui_opt2 1  "SSH"            8  "User Checker"
+ui_opt2 2  "VLESS"          9  "API Menu"
+ui_opt2 3  "VMESS"          10  "System Menu"
+ui_opt2 4  "TROJAN"        11  "Backup / Restore"
+ui_opt2 5  "NoobzVPN"      12  "RDNS Client"
+ui_opt2 6  "Auto Bulk"     13 "Change Banner"
+ui_opt2 7  "Account Cleaner"   14  "Update"
+ui_opt2 x  "Exit"           00 "REBOOT"
 ui_rule
-ui_kv "Xray" "$xray_version"
+ui_center "$xray_version"
 ui_foot
+ui_rule
 
 # --- MENU SELECTION ---
 read -p " Select Option : " mm
@@ -238,8 +242,9 @@ case $mm in
 10) clear ; run_cc ; menu-system ;;
 11) clear ; run_cc ; menu-backup ;;
 12) clear ; run_cc ; menu-rdns ;;
+00) clear ; reboot ;;
 x|X) clear ; exit 0 ;;
-u|U|update) clear ; run_cc ; update ;;
-00) clear ; run_cc ; change-banner ;;
+13) clear ; run_cc ; change-banner ;;
+14) clear ; run_cc ; update ;;
 *) echo "Invalid option, please try again." ; sleep 1 ; menu ;;
 esac
