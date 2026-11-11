@@ -1,10 +1,6 @@
 #!/usr/bin/env bash
 # ========================================================
-<<<<<<< HEAD
-# Project: autoscript VPN by kcepu877
-=======
 # Project: Autoscript VPN by kcepu877
->>>>>>> 4f16633 (initial commit)
 # Description: System, Menu & Core Scripts Updater
 # Developed for Rocky Linux 9 / Enterprise Linux
 # License: Apache License 2.0 (see LICENSE file)
@@ -46,8 +42,6 @@ elif [[ -f /etc/xray/version ]]; then
   CURRENT_VER=$(tr -d '[:space:]' < /etc/xray/version)
 fi
 
-<<<<<<< HEAD
-=======
 REPO_OWNER="kcepu877"
 REPO_NAME="scriptvpn"
 REPO_BRANCH="${REPO_BRANCH:-main}"
@@ -67,37 +61,24 @@ else
   STATUS_BADGE="${CYAN}[SUDAH VERSI TERBARU]${NC}"
 fi
 
->>>>>>> 4f16633 (initial commit)
 clear
 echo ""
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "           ${GREEN}AUTOSCRIPT SYSTEM & SCRIPT UPDATER${NC}               "
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-<<<<<<< HEAD
-echo -e " Current Installed Version : ${YELLOW}${CURRENT_VER}${NC}"
-echo -e " Repository                : ${CYAN}https://github.com/kcepu877/scriptvpn${NC}"
-=======
 echo -e " Versi Terpasang di VPS    : ${YELLOW}${CURRENT_VER}${NC}"
 echo -e " Versi Terbaru di GitHub   : ${GREEN}${LATEST_VER}${NC} ${STATUS_BADGE}"
 echo -e " Repository                : ${CYAN}https://github.com/${REPO_OWNER}/${REPO_NAME}${NC}"
 echo -e " Mode Keamanan             : ${GREEN}NON-DESTRUCTIVE (DB & JSON User Aman)${NC}"
->>>>>>> 4f16633 (initial commit)
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 
 # Confirm update unless quiet or forced
 if [[ "${1:-}" != "-y" && "${1:-}" != "--force" && "${1:-}" != "--quiet" && "${1:-}" != "-f" ]]; then
-<<<<<<< HEAD
-  read -rp "Proceed with update to the latest release/commit? [Y/n]: " ans
-  ans="${ans,,}"
-  if [[ "$ans" == "n" || "$ans" == "no" ]]; then
-    print_warn "Update cancelled by user."
-=======
   read -rp "Lanjutkan proses update ke rilis terbaru (v${LATEST_VER})? [Y/n]: " ans
   ans="${ans,,}"
   if [[ "$ans" == "n" || "$ans" == "no" ]]; then
     print_warn "Update dibatalkan oleh pengguna."
->>>>>>> 4f16633 (initial commit)
     exit 0
   fi
   echo ""
@@ -110,14 +91,6 @@ for pkg in tar gzip curl wget sqlite3; do
   fi
 done
 
-<<<<<<< HEAD
-REPO_OWNER="kcepu877"
-REPO_NAME="scriptvpn"
-REPO_BRANCH="${REPO_BRANCH:-main}"
-REPO_TARBALL="https://github.com/${REPO_OWNER}/${REPO_NAME}/archive/refs/heads/${REPO_BRANCH}.tar.gz"
-
-=======
->>>>>>> 4f16633 (initial commit)
 tmpdir=""
 srcdir=""
 
@@ -179,24 +152,16 @@ if [[ -d "$srcdir/scripts/api" ]]; then
 fi
 print_ok "Command scripts updated."
 
-<<<<<<< HEAD
-# 3. Update RDNS presets
-if [[ -d "$srcdir/scripts/rdns/presets" ]]; then
-  mkdir -p /usr/local/sbin/rdns/presets /etc/rdns/presets
-=======
 # 3. Update RDNS presets & service (preserves existing rules.json & client.yaml)
 print_info "Updating SmartDNS / RDNS presets and service..."
 mkdir -p /usr/local/sbin/rdns/presets /etc/rdns/presets /etc/rdns/certs /var/log
 touch /var/log/rdns-client.log && chmod 644 /var/log/rdns-client.log 2>/dev/null || true
 
 if [[ -d "$srcdir/scripts/rdns/presets" ]]; then
->>>>>>> 4f16633 (initial commit)
   cp -rf "$srcdir/scripts/rdns/presets/"*.json /usr/local/sbin/rdns/presets/ 2>/dev/null || true
   cp -rf "$srcdir/scripts/rdns/presets/"*.json /etc/rdns/presets/ 2>/dev/null || true
 fi
 
-<<<<<<< HEAD
-=======
 # Ensure python3-pyyaml is available
 if command -v python3 &>/dev/null && ! python3 -c "import yaml" 2>/dev/null; then
   dnf install -y python3-pyyaml >/dev/null 2>&1 || apt-get install -y python3-yaml >/dev/null 2>&1 || true
@@ -313,7 +278,6 @@ UEOF
   systemctl daemon-reload >/dev/null 2>&1 || true
 fi
 
->>>>>>> 4f16633 (initial commit)
 # 4. Cache prebuilt binaries and build scripts
 if [[ -d "$srcdir/bin" ]]; then
   mkdir -p /usr/local/share/scriptvpn/bin

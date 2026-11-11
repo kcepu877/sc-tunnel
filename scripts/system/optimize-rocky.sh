@@ -3,11 +3,7 @@
 # Project: Autoscript VPN by kcepu877
 # Description: Extreme Enterprise Linux 9 & 10 Kernel, ZRAM, Conntrack & Daemon
 #              Memory Tuning (Rocky 9-10, RHEL 9-10, AlmaLinux 9-10, Oracle Linux 9-10)
-<<<<<<< HEAD
-# Version: 5.6.0
-=======
 # Version: 5.6.1
->>>>>>> 4f16633 (initial commit)
 # License: Apache License 2.0 (see LICENSE file)
 # Repository: https://github.com/kcepu877/scriptvpn
 # ========================================================
@@ -225,11 +221,7 @@ EOF
 
   cat >/etc/sysctl.d/99-scriptvpn-extreme.conf <<EOF
 # ============================================================================
-<<<<<<< HEAD
-# Autoscript v5.6.0 Extreme Enterprise Linux 9 & 10 Kernel Tuning (${TIER})
-=======
 # Autoscript v5.6.1 Extreme Enterprise Linux 9 & 10 Kernel Tuning (${TIER})
->>>>>>> 4f16633 (initial commit)
 # ============================================================================
 
 # --- Forwarding & BBR Congestion Control ---
@@ -464,9 +456,6 @@ EOF
     limit-ip-trojan.service \
     limit-ip-vmess.service; do
     mkdir -p "/etc/systemd/system/${svc_unit}.d"
-<<<<<<< HEAD
-    cat >"/etc/systemd/system/${svc_unit}.d/10-ulimit-resilience.conf" <<'UEOF'
-=======
     local extra_runtime=""
     if [[ "$svc_unit" == "haproxy.service" ]]; then
       extra_runtime="RuntimeDirectory=haproxy
@@ -474,16 +463,11 @@ RuntimeDirectoryMode=0755
 "
     fi
     cat >"/etc/systemd/system/${svc_unit}.d/10-ulimit-resilience.conf" <<UEOF
->>>>>>> 4f16633 (initial commit)
 [Unit]
 StartLimitIntervalSec=0
 
 [Service]
-<<<<<<< HEAD
-LimitNOFILE=1048576
-=======
 ${extra_runtime}LimitNOFILE=1048576
->>>>>>> 4f16633 (initial commit)
 LimitNPROC=65535
 LimitMEMLOCK=infinity
 LimitFSIZE=infinity
@@ -501,11 +485,7 @@ UEOF
     myip=$(hostname -I 2>/dev/null | awk '{print $1}')
     domain=$(cat /etc/xray/domain 2>/dev/null | tr -d '[:space:]')
     cat >/etc/squid/squid.conf <<EOF
-<<<<<<< HEAD
-# Autoscript v5.6.0 Hardened & Low-Memory Squid Configuration
-=======
 # Autoscript v5.6.1 Hardened & Low-Memory Squid Configuration
->>>>>>> 4f16633 (initial commit)
 acl to_vps_ip dst 127.0.0.1/32
 $( [[ -n "$myip" ]] && echo "acl to_vps_ip dst ${myip}/32" )
 $( [[ -n "$domain" && "$domain" != "notset" ]] && echo "acl to_vps_dom dstdomain ${domain}" )

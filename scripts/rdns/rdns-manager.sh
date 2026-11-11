@@ -36,11 +36,7 @@ else
   err()  { echo -e " ${RED}[ERROR]${NC} $1"; }
 fi
 
-<<<<<<< HEAD
-RDNS_DIR="/etc/rdns"
-=======
 RDNS_DIR="${RDNS_DIR:-/etc/rdns}"
->>>>>>> 4f16633 (initial commit)
 CERTS_DIR="${RDNS_DIR}/certs"
 CONFIG_FILE="${RDNS_DIR}/client.yaml"
 RULES_FILE="${RDNS_DIR}/rules.json"
@@ -56,11 +52,7 @@ else
 fi
 
 # Ensure directories exist
-<<<<<<< HEAD
-mkdir -p "$CERTS_DIR"
-=======
 mkdir -p "$CERTS_DIR" 2>/dev/null || true
->>>>>>> 4f16633 (initial commit)
 
 # Helper for JSON operations via jq or python3
 json_tool() {
@@ -73,8 +65,6 @@ json_tool() {
   fi
 }
 
-<<<<<<< HEAD
-=======
 # Cross-platform service helpers (systemd & Alpine OpenRC)
 is_rdns_active() {
   if command -v systemctl &>/dev/null; then
@@ -340,28 +330,20 @@ reload_rdns() {
   fi
 }
 
->>>>>>> 4f16633 (initial commit)
 ensure_base_config() {
   local profile_name="$1"
   if [[ ! -f "$CONFIG_FILE" ]]; then
     info "Generating base configuration: $CONFIG_FILE..."
     cat >"$CONFIG_FILE" <<EOF
 listen:
-<<<<<<< HEAD
-  dns:  "0.0.0.0:5353"
-=======
   dns:  "0.0.0.0:14053"
->>>>>>> 4f16633 (initial commit)
   sni:  "0.0.0.0:14300"
   quic: "0.0.0.0:14400"
 
 rules: "${RULES_FILE}"
 
-<<<<<<< HEAD
-=======
 cdn_direct: true
 
->>>>>>> 4f16633 (initial commit)
 tls:
   ca_file:   "${CERTS_DIR}/${profile_name}-ca.crt"
   cert_file: "${CERTS_DIR}/${profile_name}.crt"
@@ -384,28 +366,22 @@ tunnel_mark: 0x200
 profiles: []
 EOF
     chmod 644 "$CONFIG_FILE"
-<<<<<<< HEAD
-=======
   else
     # Auto-migrate conflict port 5353 (used by dnsmasq / mDNS) to 14053
     if grep -q "0.0.0.0:5353" "$CONFIG_FILE" 2>/dev/null; then
       sed -i 's/0.0.0.0:5353/0.0.0.0:14053/g' "$CONFIG_FILE" 2>/dev/null || true
     fi
->>>>>>> 4f16633 (initial commit)
   fi
 
   if [[ ! -f "$RULES_FILE" ]]; then
     echo "{}" >"$RULES_FILE"
     chmod 644 "$RULES_FILE"
   fi
-<<<<<<< HEAD
-=======
 
   # Pastikan file log dibuat dengan izin yang tepat
   mkdir -p /var/log 2>/dev/null || true
   touch /var/log/rdns-client.log 2>/dev/null || true
   chmod 644 /var/log/rdns-client.log 2>/dev/null || true
->>>>>>> 4f16633 (initial commit)
 }
 
 # --- Command: pair ---
@@ -417,12 +393,9 @@ cmd_pair() {
     exit 1
   fi
 
-<<<<<<< HEAD
-=======
   # Pastikan seluruh prasyarat runtime RDNS (binary, service, log) telah terpasang
   ensure_rdns_installed
 
->>>>>>> 4f16633 (initial commit)
   if [[ "$token" != rdns://* ]]; then
     err "Invalid token format. Token must begin with 'rdns://'."
     exit 1
@@ -536,19 +509,8 @@ with open(rules_path, 'w') as f:
 EOF
 
   ok "Profile '${profile_name}' paired successfully!"
-<<<<<<< HEAD
-  info "Restarting or reloading rdns-client service..."
-  if systemctl is-active rdns-client &>/dev/null; then
-    systemctl reload rdns-client 2>/dev/null || systemctl restart rdns-client 2>/dev/null || true
-    ok "rdns-client reloaded."
-  else
-    systemctl restart rdns-client 2>/dev/null || true
-    ok "rdns-client started."
-  fi
-=======
   info "Menerapkan konfigurasi dan memverifikasi kesiapan service rdns-client..."
   start_and_verify_rdns || true
->>>>>>> 4f16633 (initial commit)
   ui_rule
   ui_kv "Profile Name" "$profile_name" "$GREEN"
   ui_kv "Server Host"  "$server_addr" "$CYAN"
@@ -597,13 +559,8 @@ with open(rules_path, 'w') as f:
 print(f"Added {len(new_domains)} domain(s) to profile '{target_prof}'.")
 EOF
 
-<<<<<<< HEAD
-  if systemctl is-active rdns-client &>/dev/null; then
-    systemctl reload rdns-client 2>/dev/null || true
-=======
   if is_rdns_active; then
     reload_rdns
->>>>>>> 4f16633 (initial commit)
     ok "Rules reloaded on running rdns-client."
   fi
 }
@@ -642,13 +599,8 @@ with open(rules_path, 'w') as f:
 print(f"Removed domain(s) from profile '{target_prof}'.")
 EOF
 
-<<<<<<< HEAD
-  if systemctl is-active rdns-client &>/dev/null; then
-    systemctl reload rdns-client 2>/dev/null || true
-=======
   if is_rdns_active; then
     reload_rdns
->>>>>>> 4f16633 (initial commit)
     ok "Rules reloaded."
   fi
 }
@@ -669,10 +621,7 @@ import json
 
 rules_path = "${RULES_FILE}"
 preset_path = "${preset_file}"
-<<<<<<< HEAD
-=======
 preset_name = "${preset}"
->>>>>>> 4f16633 (initial commit)
 target_prof = "${profile}"
 
 with open(preset_path, 'r') as f:
@@ -699,19 +648,11 @@ for d in preset_domains:
 with open(rules_path, 'w') as f:
     json.dump(rules, f, indent=2)
 
-<<<<<<< HEAD
-print(f"Preset '{preset}' ({len(preset_domains)} domains) applied to profile '{target_prof}'.")
-EOF
-
-  if systemctl is-active rdns-client &>/dev/null; then
-    systemctl reload rdns-client 2>/dev/null || true
-=======
 print(f"Preset '{preset_name}' ({len(preset_domains)} domains) applied to profile '{target_prof}'.")
 EOF
 
   if is_rdns_active; then
     reload_rdns
->>>>>>> 4f16633 (initial commit)
     ok "Rules reloaded on running rdns-client."
   fi
 }
@@ -732,10 +673,7 @@ import json
 
 rules_path = "${RULES_FILE}"
 preset_path = "${preset_file}"
-<<<<<<< HEAD
-=======
 preset_name = "${preset}"
->>>>>>> 4f16633 (initial commit)
 target_prof = "${profile}"
 
 with open(preset_path, 'r') as f:
@@ -756,19 +694,11 @@ if target_prof in rules:
 with open(rules_path, 'w') as f:
     json.dump(rules, f, indent=2)
 
-<<<<<<< HEAD
-print(f"Preset '{preset}' removed from profile '{target_prof}'.")
-EOF
-
-  if systemctl is-active rdns-client &>/dev/null; then
-    systemctl reload rdns-client 2>/dev/null || true
-=======
 print(f"Preset '{preset_name}' removed from profile '{target_prof}'.")
 EOF
 
   if is_rdns_active; then
     reload_rdns
->>>>>>> 4f16633 (initial commit)
     ok "Rules reloaded."
   fi
 }
@@ -874,10 +804,6 @@ print(f"Profile '${profile}' removed.")
 EOF
 
   rm -f "${CERTS_DIR}/${profile}.crt" "${CERTS_DIR}/${profile}.key" "${CERTS_DIR}/${profile}-ca.crt"
-<<<<<<< HEAD
-  if systemctl is-active rdns-client &>/dev/null; then
-    systemctl reload rdns-client 2>/dev/null || true
-=======
   if is_rdns_active; then
     start_and_verify_rdns || true
   fi
@@ -1089,18 +1015,14 @@ EOF
     info "Mereload service rdns-client..."
     systemctl restart rdns-client
     ok "Service rdns-client berhasil direstart dengan mode CDN baru."
->>>>>>> 4f16633 (initial commit)
   fi
 }
 
 # --- CLI Dispatcher ---
 case "${1:-}" in
-<<<<<<< HEAD
-=======
   cdn|toggle-cdn|cdn-direct)
     shift; cmd_cdn "$@"
     ;;
->>>>>>> 4f16633 (initial commit)
   pair)
     shift; cmd_pair "$@"
     ;;
@@ -1125,11 +1047,6 @@ case "${1:-}" in
   remove-profile)
     shift; cmd_remove_profile "$@"
     ;;
-<<<<<<< HEAD
-  *)
-    echo "RDNS Manager CLI (github: @kcepu877)"
-    echo "Usage: rdns-manager <pair|add-rule|remove-rule|load-preset|remove-preset|list-rules|test-domain|remove-profile>"
-=======
   status)
     cmd_status
     ;;
@@ -1148,7 +1065,6 @@ case "${1:-}" in
   *)
     echo "RDNS Manager CLI (github: @kcepu877)"
     echo "Usage: rdns-manager <pair|cdn [on|off|status|toggle]|add-rule|remove-rule|load-preset|remove-preset|list-rules|test-domain|remove-profile|status|doctor|restart|logs|update>"
->>>>>>> 4f16633 (initial commit)
     exit 1
     ;;
 esac

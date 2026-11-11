@@ -3,8 +3,6 @@
 All notable changes to this project are documented here.
 This project adheres to [Semantic Versioning](https://semver.org/).
 
-<<<<<<< HEAD
-=======
 ## [5.6.2] - 2026-11-08
 
 RDNS Integration Hardening, Active Detection & Diagnostics Engine, Collision-Free Interceptor Ports, and 1-Click Preset Setup: **Release 5.6.2**.
@@ -57,7 +55,6 @@ SmartDNS / RDNS Split Routing Native Integration, Media CDN Direct Bypass (>99% 
   - Safe decoupled asynchronous service restart preventing HTTP/API request connection drops.
   - Added native OpenRC init script support alongside systemd units for Alpine Linux compatibility.
 
->>>>>>> 4f16633 (initial commit)
 ## [5.6.0] - 2026-11-02
 
 Prebuilt Hardened Static Binaries (`Dropbear 2019.78`, `dnstt-server`, `scriptvpn`), Multi-Distro Enterprise Linux 9 & 10 Support, Zero-Downtime 100+ Simultaneous Order Burst Engine, Complete Auto-Detect User Login Endpoints, and Deep Security Hardening release: **Release 5.6.0**.
@@ -418,11 +415,7 @@ First public beta. Developed for **Rocky Linux 9**.
   starting services.
 - Rich, copy-paste-friendly account output (terminal + Telegram HTML) for
   SSH/VLESS/VMESS/Trojan create, trial, and view.
-<<<<<<< HEAD
-- SSH-over-WebSocket via GO-TUNNEL PRO (kcepu877/ws-proxy) static Go
-=======
 - SSH-over-WebSocket via GO-TUNNEL PRO (kcepu877/websocket-proxy) static Go
->>>>>>> 4f16633 (initial commit)
   binary, tuned for Rocky Linux 9 (`--auth-log /var/log/secure`, runs as root);
   also provides UDPGW on `7300`.
 - Live SSH session monitor (`cek-ssh`): correlates ssh-ws.log bandwidth and
@@ -471,10 +464,7 @@ First public beta. Developed for **Rocky Linux 9**.
 - Legacy `.txt` account files and `config.json` comment markers.
 - Ads Block (helium) menu entry.
 
-<<<<<<< HEAD
-=======
 [5.6.1]: https://github.com/kcepu877/scriptvpn/releases/tag/v5.6.1
->>>>>>> 4f16633 (initial commit)
 [5.6.0]: https://github.com/kcepu877/scriptvpn/releases/tag/v5.6.0
 [5.5.0]: https://github.com/kcepu877/scriptvpn/releases/tag/v5.5.0
 [5.4.0]: https://github.com/kcepu877/scriptvpn/releases/tag/v5.4.0
