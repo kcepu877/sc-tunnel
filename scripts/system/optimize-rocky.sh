@@ -3,9 +3,13 @@
 # Project: Autoscript VPN by kcepu877
 # Description: Extreme Enterprise Linux 9 & 10 Kernel, ZRAM, Conntrack & Daemon
 #              Memory Tuning (Rocky 9-10, RHEL 9-10, AlmaLinux 9-10, Oracle Linux 9-10)
+<<<<<<< HEAD
 # Version: 5.6.0
+=======
+# Version: 5.6.1
+>>>>>>> 4f16633 (initial commit)
 # License: Apache License 2.0 (see LICENSE file)
-# Repository: https://github.com/kcepu877/sc-tunnel
+# Repository: https://github.com/kcepu877/scriptvpn
 # ========================================================
 set -u
 
@@ -137,7 +141,7 @@ trim_el9_bloat() {
 
   # Cap systemd-journald memory & disk footprint so tmpfs /run/log never bloats
   mkdir -p /etc/systemd/journald.conf.d
-  cat >/etc/systemd/journald.conf.d/00-sc-tunnel.conf <<'EOF'
+  cat >/etc/systemd/journald.conf.d/00-scriptvpn.conf <<'EOF'
 [Journal]
 SystemMaxUse=32M
 SystemKeepFree=64M
@@ -158,7 +162,7 @@ setup_zram_and_swap() {
   local zram_mb=$(( (RAM_MB * ZRAM_PCT) / 100 ))
   (( zram_mb < 256 )) && zram_mb=256
 
-  cat >/usr/local/sbin/zram-sc-tunnel-init <<EOF
+  cat >/usr/local/sbin/zram-scriptvpn-init <<EOF
 #!/usr/bin/env bash
 modprobe zram num_devices=1 2>/dev/null || exit 0
 [[ -b /dev/zram0 ]] || exit 0
@@ -175,9 +179,9 @@ done
 echo "${zram_mb}M" > /sys/block/zram0/disksize 2>/dev/null || exit 0
 mkswap /dev/zram0 >/dev/null 2>&1 && swapon -p 100 /dev/zram0 >/dev/null 2>&1 || true
 EOF
-  chmod 0755 /usr/local/sbin/zram-sc-tunnel-init
+  chmod 0755 /usr/local/sbin/zram-scriptvpn-init
 
-  cat >/etc/systemd/system/zram-sc-tunnel.service <<'EOF'
+  cat >/etc/systemd/system/zram-scriptvpn.service <<'EOF'
 [Unit]
 Description=Autoscript Compressed ZRAM Swap Accelerator
 DefaultDependencies=no
@@ -187,7 +191,7 @@ Before=swap.target
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/usr/local/sbin/zram-sc-tunnel-init
+ExecStart=/usr/local/sbin/zram-scriptvpn-init
 ExecStop=/sbin/swapoff /dev/zram0
 
 [Install]
@@ -195,7 +199,7 @@ WantedBy=swap.target multi-user.target
 EOF
 
   systemctl daemon-reload >/dev/null 2>&1 || true
-  systemctl enable --now zram-sc-tunnel.service >/dev/null 2>&1 || /usr/local/sbin/zram-sc-tunnel-init || true
+  systemctl enable --now zram-scriptvpn.service >/dev/null 2>&1 || /usr/local/sbin/zram-scriptvpn-init || true
 
   # Ensure disk swap has lower priority (10) than ZRAM (100) so hot pages stay in compressed RAM
   if [[ -f /swapfile ]] && ! grep -q "/swapfile" /proc/swaps 2>/dev/null; then
@@ -213,15 +217,19 @@ apply_extreme_sysctl() {
   modprobe nf_conntrack >/dev/null 2>&1 || true
 
   mkdir -p /etc/sysctl.d /etc/modules-load.d
-  cat >/etc/modules-load.d/sc-tunnel.conf <<'EOF'
+  cat >/etc/modules-load.d/scriptvpn.conf <<'EOF'
 tcp_bbr
 nf_conntrack
 zram
 EOF
 
-  cat >/etc/sysctl.d/99-sc-tunnel-extreme.conf <<EOF
+  cat >/etc/sysctl.d/99-scriptvpn-extreme.conf <<EOF
 # ============================================================================
+<<<<<<< HEAD
 # Autoscript v5.6.0 Extreme Enterprise Linux 9 & 10 Kernel Tuning (${TIER})
+=======
+# Autoscript v5.6.1 Extreme Enterprise Linux 9 & 10 Kernel Tuning (${TIER})
+>>>>>>> 4f16633 (initial commit)
 # ============================================================================
 
 # --- Forwarding & BBR Congestion Control ---
@@ -301,7 +309,7 @@ fs.protected_symlinks = 1
 fs.suid_dumpable = 0
 EOF
 
-  sysctl --system >/dev/null 2>&1 || sysctl -p /etc/sysctl.d/99-sc-tunnel-extreme.conf >/dev/null 2>&1 || true
+  sysctl --system >/dev/null 2>&1 || sysctl -p /etc/sysctl.d/99-scriptvpn-extreme.conf >/dev/null 2>&1 || true
 
   # Raise conntrack hashsize dynamically to match nf_conntrack_max / 4
   if [[ -w /sys/module/nf_conntrack/parameters/hashsize ]]; then
@@ -310,7 +318,7 @@ EOF
 
   # System-wide PAM, shell & systemd ulimit ceilings (>= 65535 NPROC / 1048576 NOFILE, 0 core-dump stall)
   mkdir -p /etc/security/limits.d /etc/systemd/system.conf.d /etc/systemd/user.conf.d /etc/profile.d
-  cat >/etc/security/limits.d/99-sc-tunnel.conf <<'EOF'
+  cat >/etc/security/limits.d/99-scriptvpn.conf <<'EOF'
 *    soft nofile  1048576
 *    hard nofile  1048576
 root soft nofile  1048576
@@ -335,7 +343,7 @@ root soft core    0
 root hard core    0
 EOF
 
-  cat >/etc/profile.d/99-sc-tunnel-ulimit.sh <<'EOF'
+  cat >/etc/profile.d/99-scriptvpn-ulimit.sh <<'EOF'
 # Autoscript Enterprise Shell ulimit Guard
 ulimit -n 1048576 2>/dev/null || ulimit -n 65535 2>/dev/null || true
 ulimit -u 65535 2>/dev/null || true
@@ -343,9 +351,9 @@ ulimit -c 0 2>/dev/null || true
 ulimit -l unlimited 2>/dev/null || true
 ulimit -f unlimited 2>/dev/null || true
 EOF
-  chmod 0644 /etc/profile.d/99-sc-tunnel-ulimit.sh
+  chmod 0644 /etc/profile.d/99-scriptvpn-ulimit.sh
 
-  cat >/etc/systemd/system.conf.d/99-sc-tunnel-limits.conf <<'EOF'
+  cat >/etc/systemd/system.conf.d/99-scriptvpn-limits.conf <<'EOF'
 [Manager]
 DefaultLimitNOFILE=1048576
 DefaultLimitNPROC=65535
@@ -357,7 +365,7 @@ DefaultLimitAS=infinity
 DefaultLimitCORE=0
 DefaultTasksMax=infinity
 EOF
-  cp -f /etc/systemd/system.conf.d/99-sc-tunnel-limits.conf /etc/systemd/user.conf.d/99-sc-tunnel-limits.conf 2>/dev/null || true
+  cp -f /etc/systemd/system.conf.d/99-scriptvpn-limits.conf /etc/systemd/user.conf.d/99-scriptvpn-limits.conf 2>/dev/null || true
 
   log_ok "Kernel sysctl, BBR, conntrack (${CONNTRACK_MAX}), and full ulimit ceilings (NOFILE=1048576, NPROC=65535, CORE=0, MEMLOCK=infinity) applied."
 }
@@ -456,12 +464,26 @@ EOF
     limit-ip-trojan.service \
     limit-ip-vmess.service; do
     mkdir -p "/etc/systemd/system/${svc_unit}.d"
+<<<<<<< HEAD
     cat >"/etc/systemd/system/${svc_unit}.d/10-ulimit-resilience.conf" <<'UEOF'
+=======
+    local extra_runtime=""
+    if [[ "$svc_unit" == "haproxy.service" ]]; then
+      extra_runtime="RuntimeDirectory=haproxy
+RuntimeDirectoryMode=0755
+"
+    fi
+    cat >"/etc/systemd/system/${svc_unit}.d/10-ulimit-resilience.conf" <<UEOF
+>>>>>>> 4f16633 (initial commit)
 [Unit]
 StartLimitIntervalSec=0
 
 [Service]
+<<<<<<< HEAD
 LimitNOFILE=1048576
+=======
+${extra_runtime}LimitNOFILE=1048576
+>>>>>>> 4f16633 (initial commit)
 LimitNPROC=65535
 LimitMEMLOCK=infinity
 LimitFSIZE=infinity
@@ -479,7 +501,11 @@ UEOF
     myip=$(hostname -I 2>/dev/null | awk '{print $1}')
     domain=$(cat /etc/xray/domain 2>/dev/null | tr -d '[:space:]')
     cat >/etc/squid/squid.conf <<EOF
+<<<<<<< HEAD
 # Autoscript v5.6.0 Hardened & Low-Memory Squid Configuration
+=======
+# Autoscript v5.6.1 Hardened & Low-Memory Squid Configuration
+>>>>>>> 4f16633 (initial commit)
 acl to_vps_ip dst 127.0.0.1/32
 $( [[ -n "$myip" ]] && echo "acl to_vps_ip dst ${myip}/32" )
 $( [[ -n "$domain" && "$domain" != "notset" ]] && echo "acl to_vps_dom dstdomain ${domain}" )
@@ -520,9 +546,9 @@ EOF
 setup_dns_domain_tracker() {
   if command -v dnsmasq >/dev/null 2>&1 || dnf install -y dnsmasq >/dev/null 2>&1; then
     mkdir -p /etc/dnsmasq.d /var/log
-    touch /var/log/sc-tunnel-dns.log
-    chmod 640 /var/log/sc-tunnel-dns.log
-    cat >/etc/dnsmasq.d/sc-tunnel-cache.conf <<'EOF'
+    touch /var/log/scriptvpn-dns.log
+    chmod 640 /var/log/scriptvpn-dns.log
+    cat >/etc/dnsmasq.d/scriptvpn-cache.conf <<'EOF'
 listen-address=127.0.0.1
 port=5353
 bind-interfaces
@@ -532,10 +558,10 @@ server=8.8.8.8
 cache-size=10000
 min-cache-ttl=60
 log-queries
-log-facility=/var/log/sc-tunnel-dns.log
+log-facility=/var/log/scriptvpn-dns.log
 EOF
     if command -v chcon >/dev/null 2>&1; then
-      chcon -t dnsmasq_var_log_t /var/log/sc-tunnel-dns.log >/dev/null 2>&1 || true
+      chcon -t dnsmasq_var_log_t /var/log/scriptvpn-dns.log >/dev/null 2>&1 || true
     fi
     systemctl enable --now dnsmasq >/dev/null 2>&1 || true
   fi

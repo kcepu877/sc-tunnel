@@ -4,7 +4,7 @@
 # Description: RESTful API Management Menu (Multi-Layer SHA256 + Bearer Token)
 # Developed for Rocky Linux 9 / Enterprise Linux
 # License: Apache License 2.0 (see LICENSE file)
-# Repository: https://github.com/kcepu877/sc-tunnel
+# Repository: https://github.com/kcepu877/scriptvpn
 # ========================================================
 [[ -f /usr/local/sbin/lib/common.sh ]] && . /usr/local/sbin/lib/common.sh
 
@@ -161,10 +161,10 @@ install_api_service() {
   clear
   if [[ -f /usr/local/sbin/install-api ]]; then
     bash /usr/local/sbin/install-api
-  elif [[ -f /root/sc-tunnel/install-api.sh ]]; then
-    bash /root/sc-tunnel/install-api.sh
+  elif [[ -f /root/scriptvpn/install-api.sh ]]; then
+    bash /root/scriptvpn/install-api.sh
   else
-    curl -fsSL --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/kcepu877/sc-tunnel/main/install-api.sh | bash
+    curl -fsSL --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/kcepu877/scriptvpn/main/install-api.sh | bash
   fi
   read -n 1 -s -r -p " Press any key to return..."
 }
@@ -173,10 +173,10 @@ uninstall_api_service() {
   clear
   if [[ -f /usr/local/sbin/uninstall-api ]]; then
     bash /usr/local/sbin/uninstall-api
-  elif [[ -f /root/sc-tunnel/uninstall-api.sh ]]; then
-    bash /root/sc-tunnel/uninstall-api.sh
+  elif [[ -f /root/scriptvpn/uninstall-api.sh ]]; then
+    bash /root/scriptvpn/uninstall-api.sh
   else
-    curl -fsSL --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/kcepu877/sc-tunnel/main/uninstall-api.sh | bash
+    curl -fsSL --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/kcepu877/scriptvpn/main/uninstall-api.sh | bash
   fi
   read -n 1 -s -r -p " Press any key to return..."
 }

@@ -3,7 +3,7 @@
 # Project: Autoscript VPN by kcepu877
 # Description: VMESS traffic accounting + quota enforcement loop
 # License: Apache License 2.0 (see LICENSE file)
-# Repository: https://github.com/kcepu877/sc-tunnel
+# Repository: https://github.com/kcepu877/scriptvpn
 # ========================================================
 # Every cycle it reads each active user's xray uplink+downlink counters,
 # accumulates them into accounts.used_bytes (DB), then suspends any user

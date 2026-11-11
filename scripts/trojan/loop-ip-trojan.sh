@@ -3,6 +3,6 @@
 # Project: Autoscript VPN by kcepu877
 # Description: Service entrypoint for TROJAN IP-limit enforcement
 # License: Apache License 2.0 (see LICENSE file)
-# Repository: https://github.com/kcepu877/sc-tunnel
+# Repository: https://github.com/kcepu877/scriptvpn
 # ========================================================
 exec /usr/local/sbin/limit-ip-trojan

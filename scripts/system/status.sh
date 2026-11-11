@@ -4,7 +4,7 @@
 # Description: Service status overview + interactive control
 #              (start/stop/restart/enable/disable per service)
 # License: Apache License 2.0 (see LICENSE file)
-# Repository: https://github.com/kcepu877/sc-tunnel
+# Repository: https://github.com/kcepu877/scriptvpn
 # ========================================================
 . /usr/local/sbin/lib/common.sh
 
@@ -25,8 +25,8 @@ ROWS=(
   "vnstat|vnStat (bandwidth)|-"
   "rsyslog|rsyslog (secure)|-"
   "firewalld|Firewall|-"
-  "zram-sc-tunnel|ZRAM Memory Tier|-"
-  "dnsmasq-sc-tunnel|DNS App Telemetry|5353*"
+  "zram-scriptvpn|ZRAM Memory Tier|-"
+  "dnsmasq-scriptvpn|DNS App Telemetry|5353*"
   "quota-ssh|SSH All-Proto Quota|-"
   "quota|VLESS quota loop|-"
   "limit-ip-vless|VLESS ip-limit|-"

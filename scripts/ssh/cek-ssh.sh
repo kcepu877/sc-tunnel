@@ -5,7 +5,7 @@
 #              Covers: OpenSSH, Dropbear Direct, Direct SSH SSL/TLS,
 #                      SSH WebSocket, SlowDNS, and OpenVPN
 # License: Apache License 2.0 (see LICENSE file)
-# Repository: https://github.com/kcepu877/sc-tunnel
+# Repository: https://github.com/kcepu877/scriptvpn
 # ========================================================
 . /usr/local/sbin/lib/account.sh
 

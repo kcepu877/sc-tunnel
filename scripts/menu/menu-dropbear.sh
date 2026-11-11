@@ -3,9 +3,13 @@
 # Project: Autoscript VPN by kcepu877
 # Description: Hardened Dropbear SSH Manager (Prebuilt 2019.78 + Multi-Version)
 # Supported OS: Rocky Linux 9-10, RHEL 9-10, AlmaLinux 9-10, Oracle Linux 9-10
+<<<<<<< HEAD
 # Version: 5.6.0
+=======
+# Version: 5.6.1
+>>>>>>> 4f16633 (initial commit)
 # License: Apache License 2.0 (see LICENSE file)
-# Repository: https://github.com/kcepu877/sc-tunnel
+# Repository: https://github.com/kcepu877/scriptvpn
 # ========================================================
 [[ -f /usr/local/sbin/lib/common.sh ]] && . /usr/local/sbin/lib/common.sh
 
@@ -21,7 +25,7 @@ DROPBEAR_KEY_BIN="/usr/bin/dropbearkey"
 DROPBEAR_CONFIG="/etc/dropbear"
 DROPBEAR_URL="https://matt.ucc.asn.au/dropbear/releases"
 REPO_OWNER="kcepu877"
-REPO_NAME="sc-tunnel"
+REPO_NAME="scriptvpn"
 
 clear
 ui_header "DROPBEAR SSH MANAGER"
@@ -64,7 +68,7 @@ install_prebuilt_dropbear_2019() {
   chmod 700 "$tmp_dir"
 
   local -a sources=(
-    "/usr/local/share/sc-tunnel/bin/${archive_name}|/usr/local/share/sc-tunnel/bin/${sha_name}"
+    "/usr/local/share/scriptvpn/bin/${archive_name}|/usr/local/share/scriptvpn/bin/${sha_name}"
     "https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/latest/download/${archive_name}|https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/latest/download/${sha_name}"
     "https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/bin/${archive_name}|https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/bin/${sha_name}"
   )
@@ -101,9 +105,9 @@ install_prebuilt_dropbear_2019() {
         install -m 0755 "${tmp_dir}/extract/dropbear" "$DROPBEAR_BIN"
         install -m 0755 "${tmp_dir}/extract/dropbearkey" "$DROPBEAR_KEY_BIN"
         ln -sf "$DROPBEAR_KEY_BIN" /usr/sbin/dropbearkey
-        mkdir -p /usr/local/share/sc-tunnel/bin
-        cp -f "${tmp_dir}/${archive_name}" "/usr/local/share/sc-tunnel/bin/${archive_name}" 2>/dev/null || true
-        cp -f "${tmp_dir}/${sha_name}" "/usr/local/share/sc-tunnel/bin/${sha_name}" 2>/dev/null || true
+        mkdir -p /usr/local/share/scriptvpn/bin
+        cp -f "${tmp_dir}/${archive_name}" "/usr/local/share/scriptvpn/bin/${archive_name}" 2>/dev/null || true
+        cp -f "${tmp_dir}/${sha_name}" "/usr/local/share/scriptvpn/bin/${sha_name}" 2>/dev/null || true
         rm -rf "$tmp_dir"
         ok "Prebuilt Hardened Dropbear 2019.78 SHA-256 verified & installed!"
         return 0

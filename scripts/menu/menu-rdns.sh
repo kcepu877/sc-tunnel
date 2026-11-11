@@ -4,7 +4,7 @@
 # Module: RDNS Client Interactive TUI Menu
 # Author / Credit: github: @kcepu877
 # License: Apache License 2.0 (see LICENSE file)
-# Repository: https://github.com/kcepu877/sc-tunnel
+# Repository: https://github.com/kcepu877/scriptvpn
 # ========================================================
 
 # Load Autoscript common helpers
@@ -95,6 +95,17 @@ menu_rdns() {
   local profiles; profiles=$(get_profile_list)
   local prof_count; prof_count=$(echo "$profiles" | wc -w)
   local rules_count; rules_count=$(get_rules_count)
+<<<<<<< HEAD
+=======
+  local cdn_st; cdn_st=$(grep -E '^\s*cdn_direct:' /etc/rdns/client.yaml 2>/dev/null | awk '{print $2}' | tr -d ' "' || echo "true")
+  [[ -z "$cdn_st" ]] && cdn_st="true"
+  local cdn_label
+  if [[ "$cdn_st" == "true" ]]; then
+    cdn_label="${GREEN}ON (Bypass Direct - Hemat Kuota >99%)${NC}"
+  else
+    cdn_label="${YELLOW}OFF (Semua Video Lewat Tunnel Exit Node)${NC}"
+  fi
+>>>>>>> 4f16633 (initial commit)
 
   ui_header "RDNS CLIENT (STEALTH TUNNEL)"
   ui_kv "Author / Credit" "${CYAN}github: @kcepu877${NC}"
@@ -103,6 +114,10 @@ menu_rdns() {
   ui_status "RDNS Service"  "$svc_st"
   ui_kv "Active Nodes"    "${prof_count} Exit Node(s)"
   ui_kv "Routed Rules"    "${rules_count} Domain(s)"
+<<<<<<< HEAD
+=======
+  ui_kv "Media CDN Direct" "$cdn_label"
+>>>>>>> 4f16633 (initial commit)
   ui_rule
   ui_label "PAIRING & PROFILES"
   ui_opt 1  "Pair Exit Node Baru (Paste Token rdns://...)"
@@ -119,8 +134,17 @@ menu_rdns() {
   ui_opt 8  "Lihat Semua Routing Rules Aktif"
   ui_opt 9  "Test Routing Domain (Dry-Run Matcher)"
   ui_rule
+<<<<<<< HEAD
   ui_label "MAINTENANCE"
   ui_opt 10 "Restart / Reload Service rdns-client"
+=======
+  ui_label "MAINTENANCE & MONITORING"
+  ui_opt 10 "Toggle Media CDN Direct Bypass (ON / OFF)"
+  ui_opt 11 "Restart / Reload Service rdns-client"
+  ui_opt 12 "Lihat Log Real-Time (rdns-client.log)"
+  ui_opt 13 "Diagnostik & Cek Kesehatan Sistem (Doctor)"
+  ui_opt 14 "Update / Sinkronkan Binary rdns-client (v0.2.1)"
+>>>>>>> 4f16633 (initial commit)
   ui_rule
   ui_opt 0  "Kembali ke Menu Utama"
   ui_foot
@@ -138,8 +162,44 @@ menu_rdns() {
       if [[ -z "$user_token" ]]; then
         err "Token tidak boleh kosong."
       else
+<<<<<<< HEAD
         info "Memproses token pairing..."
         bash "$RDNS_MGR" pair "$user_token" || true
+=======
+        info "Memproses token pairing dan verifikasi service..."
+        if bash "$RDNS_MGR" pair "$user_token"; then
+          # Cek apakah profil yang baru saja dipair memiliki domain rules
+          local current_profs; current_profs=$(get_profile_list)
+          local last_prof; last_prof=$(echo "$current_profs" | awk '{print $NF}')
+          if [[ -n "$last_prof" ]]; then
+            local p_rules_count
+            p_rules_count=$(python3 -c "import json; r=json.load(open('/etc/rdns/rules.json')); print(len(r.get('$last_prof',[])))" 2>/dev/null || echo "0")
+            if [[ "$p_rules_count" -eq 0 ]]; then
+              echo ""
+              ui_rule
+              echo -e " ${GREEN}Node '${last_prof}' berhasil terhubung dan service aktif!${NC}"
+              echo -e " ${YELLOW}Saat ini node belum memiliki domain rules. Terapkan preset sekarang?${NC}"
+              echo ""
+              echo -e " ${PINK}(• 1)${NC} ${WHITE}│ Streaming & OTT Populer (Netflix, Disney+, Viu, Vidio, Prime, HBO)${NC}"
+              echo -e " ${PINK}(• 2)${NC} ${WHITE}│ Malaysia Region (.my, Maybank, CIMB, TNG, Boost, Astro, Sooka)${NC}"
+              echo -e " ${PINK}(• 3)${NC} ${WHITE}│ Indonesia Region (.id, BCA, Mandiri, BRI, BNI, Dana, GoPay, Pajak)${NC}"
+              echo -e " ${PINK}(• 4)${NC} ${WHITE}│ AI Services (OpenAI ChatGPT, Claude, Gemini, Copilot, Perplexity)${NC}"
+              echo -e " ${PINK}(• 5)${NC} ${WHITE}│ Bypass IP Check (ipinfo, speedtest, fast.com)${NC}"
+              echo -e " ${PINK}(• 0)${NC} ${WHITE}│ Lewati (Konfigurasi manual nanti)${NC}"
+              echo ""
+              read -rp " Pilih preset awal [0-5]: " init_preset
+              case "$init_preset" in
+                1) bash "$RDNS_MGR" load-preset "$last_prof" "streaming" ;;
+                2) bash "$RDNS_MGR" load-preset "$last_prof" "malaysia" ;;
+                3) bash "$RDNS_MGR" load-preset "$last_prof" "indonesia" ;;
+                4) bash "$RDNS_MGR" load-preset "$last_prof" "ai-services" ;;
+                5) bash "$RDNS_MGR" load-preset "$last_prof" "ipcheck" ;;
+                *) info "Konfigurasi rules dilewati. Anda dapat menambahkannya nanti melalui menu." ;;
+              esac
+            fi
+          fi
+        fi
+>>>>>>> 4f16633 (initial commit)
       fi
       ui_foot
       ui_back
@@ -153,7 +213,11 @@ menu_rdns() {
       ui_rule
       if [[ -f /etc/rdns/client.yaml ]]; then
         python3 - <<'EOF'
+<<<<<<< HEAD
 import yaml
+=======
+import yaml, socket
+>>>>>>> 4f16633 (initial commit)
 try:
     with open('/etc/rdns/client.yaml', 'r') as f:
         cfg = yaml.safe_load(f) or {}
@@ -163,7 +227,19 @@ try:
     else:
         print(f" \033[1;37mTotal Exit Nodes Terdaftar:\033[0m \033[0;36m{len(profiles)}\033[0m\n")
         for i, p in enumerate(profiles, 1):
+<<<<<<< HEAD
             print(f" \033[38;5;205m(•{i:2d})\033[0m \033[1;37m│\033[0m \033[1;32m{p.get('name')}\033[0m")
+=======
+            server = p.get('server', '')
+            host, _, port = server.partition(':')
+            status_conn = "\033[1;32mONLINE / REACHABLE\033[0m"
+            try:
+                s = socket.create_connection((host, int(port) if port else 443), timeout=2.0)
+                s.close()
+            except Exception:
+                status_conn = "\033[1;31mOFFLINE / UNREACHABLE\033[0m"
+            print(f" \033[38;5;205m(•{i:2d})\033[0m \033[1;37m│\033[0m \033[1;32m{p.get('name')}\033[0m  [{status_conn}]")
+>>>>>>> 4f16633 (initial commit)
             print(f"       \033[0;36mServer Host  :\033[0m {p.get('server')}")
             print(f"       \033[0;36mServer Name  :\033[0m {p.get('server_name')}")
             print(f"       \033[0;36mDNS Upstream :\033[0m {p.get('dns')}")
@@ -223,6 +299,7 @@ EOF
           echo ""
           ui_rule
           ui_label "PILIH KATEGORI PRESET"
+<<<<<<< HEAD
           ui_opt 1 "Streaming (Netflix, Disney+, Viu, Vidio, Prime, Crunchyroll, etc)"
           ui_opt 2 "Malaysia (TLD .my, Maybank, CIMB, TNG, Boost, Astro, Unifi)"
           ui_opt 3 "Indonesia (TLD .id, BCA, Mandiri, BRI, BNI, Dana, GoPay, Pajak)"
@@ -232,12 +309,30 @@ EOF
           ui_opt 0 "Batal"
           ui_foot
           read -rp " Pilihan Preset [1-5]: " p_choice
+=======
+          ui_opt 1 "Streaming & OTT Populer (Netflix, Disney+ Hotstar, Viu, Vidio, Prime, HBO, Astro, Sooka)"
+          ui_opt 2 "Malaysia Region (Semua Web .my, Maybank, CIMB, TNG, Boost, Astro, Sooka, Unifi)"
+          ui_opt 3 "Indonesia Region (Semua Web .id, BCA, Mandiri, BRI, BNI, Dana, GoPay, Pajak)"
+          ui_opt 4 "Bypass IP Check (ipinfo, speedtest, fast.com, ifconfig)"
+          ui_opt 5 "Google & YouTube (YouTube, Gmail, Play Store, Google Services)"
+          ui_opt 6 "AI Services (OpenAI ChatGPT, Claude, Gemini, Copilot, Perplexity)"
+          ui_opt 7 "Social Media & Gaming (TikTok, Reddit, Discord, Steam)"
+          ui_rule
+          ui_opt 0 "Batal"
+          ui_foot
+          read -rp " Pilihan Preset [1-7]: " p_choice
+>>>>>>> 4f16633 (initial commit)
           case "$p_choice" in
             1) bash "$RDNS_MGR" load-preset "$target_prof" "streaming" ;;
             2) bash "$RDNS_MGR" load-preset "$target_prof" "malaysia" ;;
             3) bash "$RDNS_MGR" load-preset "$target_prof" "indonesia" ;;
             4) bash "$RDNS_MGR" load-preset "$target_prof" "ipcheck" ;;
             5) bash "$RDNS_MGR" load-preset "$target_prof" "google" ;;
+<<<<<<< HEAD
+=======
+            6) bash "$RDNS_MGR" load-preset "$target_prof" "ai-services" ;;
+            7) bash "$RDNS_MGR" load-preset "$target_prof" "social-media" ;;
+>>>>>>> 4f16633 (initial commit)
             0) info "Batal." ;;
             *) err "Pilihan tidak valid." ;;
           esac
@@ -263,6 +358,7 @@ EOF
           echo ""
           ui_rule
           ui_label "PILIH PRESET YANG INGIN DIHAPUS"
+<<<<<<< HEAD
           ui_opt 1 "Streaming"
           ui_opt 2 "Malaysia"
           ui_opt 3 "Indonesia"
@@ -272,12 +368,30 @@ EOF
           ui_opt 0 "Batal"
           ui_foot
           read -rp " Pilihan [1-5]: " p_choice
+=======
+          ui_opt 1 "Streaming & OTT Populer"
+          ui_opt 2 "Malaysia Region"
+          ui_opt 3 "Indonesia Region"
+          ui_opt 4 "Bypass IP Check"
+          ui_opt 5 "Google & YouTube"
+          ui_opt 6 "AI Services"
+          ui_opt 7 "Social Media & Gaming"
+          ui_rule
+          ui_opt 0 "Batal"
+          ui_foot
+          read -rp " Pilihan [1-7]: " p_choice
+>>>>>>> 4f16633 (initial commit)
           case "$p_choice" in
             1) bash "$RDNS_MGR" remove-preset "$target_prof" "streaming" ;;
             2) bash "$RDNS_MGR" remove-preset "$target_prof" "malaysia" ;;
             3) bash "$RDNS_MGR" remove-preset "$target_prof" "indonesia" ;;
             4) bash "$RDNS_MGR" remove-preset "$target_prof" "ipcheck" ;;
             5) bash "$RDNS_MGR" remove-preset "$target_prof" "google" ;;
+<<<<<<< HEAD
+=======
+            6) bash "$RDNS_MGR" remove-preset "$target_prof" "ai-services" ;;
+            7) bash "$RDNS_MGR" remove-preset "$target_prof" "social-media" ;;
+>>>>>>> 4f16633 (initial commit)
             0) info "Batal." ;;
             *) err "Pilihan tidak valid." ;;
           esac
@@ -370,6 +484,7 @@ EOF
 
     10)
       clear
+<<<<<<< HEAD
       ui_header "RESTART / RELOAD RDNS SERVICE"
       ui_kv "Credit" "github: @kcepu877" "$PINK"
       ui_rule
@@ -381,6 +496,48 @@ EOF
       else
         warn "rdns-client tidak aktif. Cek log dengan: journalctl -u rdns-client -n 20"
       fi
+=======
+      ui_header "TOGGLE MEDIA CDN DIRECT BYPASS"
+      ui_kv "Credit" "github: @kcepu877" "$PINK"
+      ui_rule
+      bash "$RDNS_MGR" cdn toggle || true
+      ui_foot
+      ui_back
+      menu_rdns
+      ;;
+
+    11)
+      clear
+      bash "$RDNS_MGR" restart || true
+      ui_foot
+      ui_back
+      menu_rdns
+      ;;
+
+    12)
+      clear
+      ui_header "LOG RUNTIME RDNS CLIENT"
+      ui_kv "Credit" "github: @kcepu877" "$PINK"
+      ui_rule
+      echo -e " ${WHITE}Menampilkan 35 baris log terakhir (/var/log/rdns-client.log):${NC}\n"
+      bash "$RDNS_MGR" logs || true
+      ui_foot
+      ui_back
+      menu_rdns
+      ;;
+
+    13)
+      clear
+      bash "$RDNS_MGR" doctor || true
+      ui_foot
+      ui_back
+      menu_rdns
+      ;;
+
+    14)
+      clear
+      bash "$RDNS_MGR" update || true
+>>>>>>> 4f16633 (initial commit)
       ui_foot
       ui_back
       menu_rdns

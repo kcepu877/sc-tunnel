@@ -3,7 +3,7 @@
 # Project: Autoscript VPN by kcepu877
 # Description: SlowDNS (DNSTT) Server Management
 # License: Apache License 2.0 (see LICENSE file)
-# Repository: https://github.com/kcepu877/sc-tunnel
+# Repository: https://github.com/kcepu877/scriptvpn
 # ========================================================
 [[ -f /usr/local/sbin/lib/common.sh ]] && . /usr/local/sbin/lib/common.sh || . "$(dirname "$0")/../lib/common.sh"
 
@@ -88,7 +88,7 @@ slowdns_setup_service() {
 [Unit]
 Description=SlowDNS (DNSTT) Tunnel Server
 After=network.target dropbear.service
-Documentation=https://github.com/kcepu877/sc-tunnel
+Documentation=https://github.com/kcepu877/scriptvpn
 StartLimitIntervalSec=0
 
 [Service]
@@ -140,9 +140,9 @@ slowdns_install() {
       chmod 700 "$pre_tmp"
 
       local -a sources=(
-        "/usr/local/share/sc-tunnel/bin/${arc_name}|/usr/local/share/sc-tunnel/bin/${sha_name}"
-        "https://github.com/kcepu877/sc-tunnel/releases/latest/download/${arc_name}|https://github.com/kcepu877/sc-tunnel/releases/latest/download/${sha_name}"
-        "https://raw.githubusercontent.com/kcepu877/sc-tunnel/main/bin/${arc_name}|https://raw.githubusercontent.com/kcepu877/sc-tunnel/main/bin/${sha_name}"
+        "/usr/local/share/scriptvpn/bin/${arc_name}|/usr/local/share/scriptvpn/bin/${sha_name}"
+        "https://github.com/kcepu877/scriptvpn/releases/latest/download/${arc_name}|https://github.com/kcepu877/scriptvpn/releases/latest/download/${sha_name}"
+        "https://raw.githubusercontent.com/kcepu877/scriptvpn/main/bin/${arc_name}|https://raw.githubusercontent.com/kcepu877/scriptvpn/main/bin/${sha_name}"
       )
 
       local pair s_arc s_sha exp_h act_h

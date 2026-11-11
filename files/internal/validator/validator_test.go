@@ -3,7 +3,7 @@ package validator
 import (
 	"testing"
 
-	"github.com/kcepu877/sc-tunnel/internal/model"
+	"github.com/kcepu877/scriptvpn/internal/model"
 )
 
 func TestValidatorProtocols(t *testing.T) {

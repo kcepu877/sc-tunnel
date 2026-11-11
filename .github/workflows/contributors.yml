@@ -33,7 +33,7 @@ jobs:
           python3 -c "
           import os, json, urllib.request
 
-          repo = os.environ.get('REPO', 'kcepu877/sc-tunnel')
+          repo = os.environ.get('REPO', 'kcepu877/scriptvpn')
           token = os.environ.get('GITHUB_TOKEN', '')
           url = f'https://api.github.com/repos/{repo}/contributors'
           

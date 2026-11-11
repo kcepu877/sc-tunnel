@@ -3,7 +3,7 @@
 # Project: Autoscript VPN by kcepu877
 # Description: Configure Telegram bot token + admin chat id (for notifications/backup)
 # License: Apache License 2.0 (see LICENSE file)
-# Repository: https://github.com/kcepu877/sc-tunnel
+# Repository: https://github.com/kcepu877/scriptvpn
 # ========================================================
 . /usr/local/sbin/lib/common.sh
 require_root

@@ -4,7 +4,7 @@
 # Description: AutoScript VPN & Tunneling Management System
 # Developed for Rocky Linux 9
 # License: Apache License 2.0 (see LICENSE file)
-# Repository: https://github.com/kcepu877/sc-tunnel
+# Repository: https://github.com/kcepu877/scriptvpn
 # ========================================================
 # System Uninstaller — removes everything install.sh created:
 #   services, binaries, command scripts, libraries, database, configs,
@@ -34,7 +34,7 @@ echo "[1/9] Stopping and disabling services..."
 SERVICES=(
     haproxy xray nginx dropbear ssh-ws server api-server squid slowdns noobzvpns
     quota-ssh quota limit-ip-vless quota-trojan limit-ip-trojan quota-vmess limit-ip-vmess
-    zram-sc-tunnel dnsmasq-sc-tunnel
+    zram-scriptvpn dnsmasq-scriptvpn
     autoexpire.timer limit-ip-ssh.timer backup.timer fixlog.timer
     openvpn-server@server-tcp-1194
 )
@@ -62,9 +62,9 @@ rm -f /etc/systemd/system/quota-vmess.service
 rm -f /etc/systemd/system/limit-ip-vless.service
 rm -f /etc/systemd/system/limit-ip-trojan.service
 rm -f /etc/systemd/system/limit-ip-vmess.service
-rm -f /etc/systemd/system/zram-sc-tunnel.service
-rm -f /etc/systemd/system/dnsmasq-sc-tunnel.service
-rm -f /etc/sysctl.d/99-sc-tunnel-extreme.conf
+rm -f /etc/systemd/system/zram-scriptvpn.service
+rm -f /etc/systemd/system/dnsmasq-scriptvpn.service
+rm -f /etc/sysctl.d/99-scriptvpn-extreme.conf
 # Scheduled-maintenance timers + their oneshot services (replaced cron).
 rm -f /etc/systemd/system/autoexpire.timer   /etc/systemd/system/autoexpire.service
 rm -f /etc/systemd/system/limit-ip-ssh.timer /etc/systemd/system/limit-ip-ssh.service
@@ -83,7 +83,7 @@ rm -f /usr/sbin/dns-server
 rm -f /usr/bin/noobzvpns
 rm -f /var/log/ssh-ws.log
 rm -rf /usr/local/share/xray
-rm -f /etc/rsyslog.d/00-sc-tunnel-secure.conf
+rm -f /etc/rsyslog.d/00-scriptvpn-secure.conf
 systemctl restart rsyslog 2>/dev/null
 
 # ---------------------------------------------------------------------------
@@ -105,7 +105,7 @@ for cmd in menu menu-ssh menu-vless menu-vmess menu-trojan menu-host menu-backup
     loop-quota-ssh loop-quota-vless loop-quota-vmess loop-quota-trojan \
     quota-ssh quota-vless quota-vmess quota-trojan \
     xp-ssh xp-vless xp-vmess xp-trojan xp-noobz \
-    install-api uninstall-api slowdns menu-rdns rdns-manager fix-firewall optimize-rocky zram-sc-tunnel \
+    install-api uninstall-api slowdns menu-rdns rdns-manager fix-firewall optimize-rocky zram-scriptvpn \
     backup restore fixlog limit-speed bw-monitor versi-xray stream-check change-domain change-dns change-timezone change-banner status set-telegram uninstall; do
     rm -f "/usr/local/sbin/$cmd"
 done

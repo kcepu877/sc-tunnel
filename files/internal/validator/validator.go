@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kcepu877/sc-tunnel/internal/model"
+	"github.com/kcepu877/scriptvpn/internal/model"
 )
 
 // Reserved Linux system usernames that must never be created, modified, or deleted as VPN SSH users.
@@ -38,7 +38,7 @@ var AllowedManagedServices = map[string]bool{
 	"loop-limit-ssh":                 true,
 	"loop-quota-xray":                true,
 	"loop-limit-xray":                true,
-	"dnsmasq-sc-tunnel":             true,
+	"dnsmasq-scriptvpn":             true,
 }
 
 // Validator provides strict, injection-proof input validation methods.

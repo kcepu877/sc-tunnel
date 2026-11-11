@@ -4,7 +4,7 @@
 # Description: Bandwidth Usage Monitor via vnstat
 #              Daily / Weekly / Monthly / Yearly history
 # License: Apache License 2.0 (see LICENSE file)
-# Repository: https://github.com/kcepu877/sc-tunnel
+# Repository: https://github.com/kcepu877/scriptvpn
 # ========================================================
 
 [[ -f /usr/local/sbin/lib/common.sh ]] && . /usr/local/sbin/lib/common.sh

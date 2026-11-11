@@ -9,8 +9,8 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/kcepu877/sc-tunnel/internal/config"
-	"github.com/kcepu877/sc-tunnel/internal/model"
+	"github.com/kcepu877/scriptvpn/internal/config"
+	"github.com/kcepu877/scriptvpn/internal/model"
 	"github.com/rs/zerolog"
 )
 

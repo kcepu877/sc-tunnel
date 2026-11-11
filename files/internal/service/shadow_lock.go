@@ -21,7 +21,7 @@ type sshCreateOp struct {
 }
 
 // ShadowMutator serializes and group-commits Linux /etc/passwd & /etc/shadow mutations
-// across both concurrent API goroutines and CLI shell scripts (/run/sc-tunnel-shadow.lock).
+// across both concurrent API goroutines and CLI shell scripts (/run/scriptvpn-shadow.lock).
 // Under 100+ simultaneous SSH order requests, pending user creations are coalesced under a single lock
 // with a single batch `chpasswd` pipe so `useradd: cannot lock /etc/passwd` never occurs.
 type ShadowMutator struct {
@@ -34,11 +34,11 @@ type ShadowMutator struct {
 
 // NewShadowMutator creates a new ShadowMutator.
 func NewShadowMutator() *ShadowMutator {
-	lockPath := "/run/sc-tunnel-shadow.lock"
+	lockPath := "/run/scriptvpn-shadow.lock"
 	if isTestMode() || os.Geteuid() != 0 {
-		lockPath = filepath.Join(os.TempDir(), "sc-tunnel-shadow.lock")
+		lockPath = filepath.Join(os.TempDir(), "scriptvpn-shadow.lock")
 	} else if _, err := os.Stat("/run"); err != nil {
-		lockPath = filepath.Join(os.TempDir(), "sc-tunnel-shadow.lock")
+		lockPath = filepath.Join(os.TempDir(), "scriptvpn-shadow.lock")
 	}
 	return &ShadowMutator{
 		lockFile: lockPath,
@@ -48,7 +48,7 @@ func NewShadowMutator() *ShadowMutator {
 func (s *ShadowMutator) acquireFlock() (*os.File, func()) {
 	f, err := os.OpenFile(s.lockFile, os.O_CREATE|os.O_RDWR, 0600)
 	if err != nil {
-		alt := filepath.Join(os.TempDir(), "sc-tunnel-shadow.lock")
+		alt := filepath.Join(os.TempDir(), "scriptvpn-shadow.lock")
 		f, err = os.OpenFile(alt, os.O_CREATE|os.O_RDWR, 0600)
 		if err != nil {
 			return nil, func() {}

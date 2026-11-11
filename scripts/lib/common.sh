@@ -3,7 +3,7 @@
 # Project: Autoscript VPN by kcepu877
 # Description: Shared common helpers (colors, validation, IO)
 # License: Apache License 2.0 (see LICENSE file)
-# Repository: https://github.com/kcepu877/sc-tunnel
+# Repository: https://github.com/kcepu877/scriptvpn
 # ========================================================
 # Source this file:  . /usr/local/sbin/lib/common.sh
 # Guard against double-sourcing.
@@ -395,7 +395,7 @@ detect_el_distro() {
 # Args: <ip>
 # Returns: <asn_or_isp>|<location> (e.g. "AS4818 DiGi Telecommunications Sdn. Bhd.|Kuching, Sarawak, MY")
 declare -gA __LIVE_IP_CACHE=()
-export AS_GEOIP_CACHE="/run/sc-tunnel-geoip.cache"
+export AS_GEOIP_CACHE="/run/scriptvpn-geoip.cache"
 
 lookup_ip_geo() {
   local ip="$1"
@@ -578,7 +578,7 @@ __DNS_MAP_LOADED=0
 _load_dns_ip_map() {
   (( __DNS_MAP_LOADED )) && return
   __DNS_MAP_LOADED=1
-  local dnslog="/var/log/sc-tunnel-dns.log"
+  local dnslog="/var/log/scriptvpn-dns.log"
   [[ -s "$dnslog" ]] || return
   while IFS='|' read -r rip rdom; do
     [[ -n "$rip" && -n "$rdom" ]] && __DNS_IP_MAP[$rip]="$rdom"

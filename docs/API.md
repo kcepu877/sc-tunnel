@@ -3,7 +3,7 @@
 > **Version:** 5.6.1 (Enterprise Production Release — EL9 & EL10)  
 > **Server Engine:** Go FastHTTP Daemon (`api-server`) + Separated SQLite WAL Reader/Writer Pools (Zero CGO)  
 > **Security Standard:** 5-Layer Strict SHA-256 + Canonical HMAC-SHA256 + Mutual Response Signatures  
-> **Repository:** [https://github.com/kcepu877/sc-tunnel](https://github.com/kcepu877/sc-tunnel)
+> **Repository:** [https://github.com/kcepu877/scriptvpn](https://github.com/kcepu877/scriptvpn)
 
 ---
 
@@ -186,7 +186,11 @@ export function signAutoscriptRequest(
 ```python
 import hashlib, hmac, secrets, time, urllib.parse
 
+<<<<<<< HEAD
 def sign_autoscript_request(method: str, path: str, params: dict, body: bytes, token: str, secret: str) -> dict:
+=======
+def sign_scriptvpn_request(method: str, path: str, params: dict, body: bytes, token: str, secret: str) -> dict:
+>>>>>>> 4f16633 (initial commit)
     ts = str(int(time.time()))
     nonce = secrets.token_hex(16)
     body_sha = hashlib.sha256(body).hexdigest()
@@ -560,7 +564,11 @@ Works across `vless`, `vmess`, `trojan`, `noobz`, and `ssh`.
 Provides real-time visibility into connected users across every protocol, including:
 - **Apps & Domains Currently Accessed** (classifies 65+ apps across Streaming, Social, Messaging, Gaming, AI, E-Commerce, Cloud/CDN: *YouTube, Netflix, TikTok, Instagram, WhatsApp, Telegram, Discord, ChatGPT/OpenAI, Claude, Mobile Legends, PUBG, Roblox, Shopee, Tokopedia*, etc.)
 - **Exact Protocol & Transport Used** (`openssh`, `dropbear`, `ssh_ssl`, `ssh_ws`, `slowdns`, `openvpn`, `vless-ws`, `vless-grpc`, `vless-xhttp`, `vless-hu`, `noobz`)
+<<<<<<< HEAD
 - **ISP / ASN & Geographic Location** (3-tier free GeoIP lookup: `ip-api.com/batch` -> `ipwho.is` -> `freeipapi.com` with 24h RAM + `/run/autoscript-geoip.cache` caching)
+=======
+- **ISP / ASN & Geographic Location** (3-tier free GeoIP lookup: `ip-api.com/batch` -> `ipwho.is` -> `freeipapi.com` with 24h RAM + `/run/scriptvpn-geoip.cache` caching)
+>>>>>>> 4f16633 (initial commit)
 
 ### Endpoints
 - `GET /api/users/{username}/login` *(or `GET /api/users/{username}` or `GET /api/monitor/users/{username}`)* — **Auto-Detect User Login by Username & All Information**: automatically detects every protocol (`ssh`, `vless`, `vmess`, `trojan`, `noobz`) belonging to `{username}` without needing to specify `{protocol}`, returning online state, active sub-protocols (`openssh`, `dropbear`, `ssh_ssl`, `ssh_ws`, `slowdns`, `openvpn`, Xray transports), connected IPs, ISPs/ASNs, GeoIP locations, accessed apps/domains, full quota breakdown, and ready-to-use `config` connection links!

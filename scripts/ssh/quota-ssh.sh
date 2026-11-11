@@ -7,14 +7,14 @@
 #                      SSH WebSocket (80,8080,8888,443 via ssh-ws),
 #                      SlowDNS (53,5300 via dnstt), and OpenVPN (1194 TCP/UDP)
 # License: Apache License 2.0 (see LICENSE file)
-# Repository: https://github.com/kcepu877/sc-tunnel
+# Repository: https://github.com/kcepu877/scriptvpn
 # ========================================================
 . /usr/local/sbin/lib/account.sh
 
 db_init
 
-STATE_FILE="/run/sc-tunnel-ssh-quota.state"
-LOCK_FILE="/run/sc-tunnel-ssh-quota.lock"
+STATE_FILE="/run/scriptvpn-ssh-quota.state"
+LOCK_FILE="/run/scriptvpn-ssh-quota.lock"
 mkdir -p /run 2>/dev/null
 
 exec 201>"$LOCK_FILE"

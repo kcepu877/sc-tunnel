@@ -7,11 +7,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kcepu877/sc-tunnel/internal/cache"
-	"github.com/kcepu877/sc-tunnel/internal/config"
-	"github.com/kcepu877/sc-tunnel/internal/model"
-	"github.com/kcepu877/sc-tunnel/internal/service"
-	"github.com/kcepu877/sc-tunnel/internal/validator"
+	"github.com/kcepu877/scriptvpn/internal/cache"
+	"github.com/kcepu877/scriptvpn/internal/config"
+	"github.com/kcepu877/scriptvpn/internal/model"
+	"github.com/kcepu877/scriptvpn/internal/service"
+	"github.com/kcepu877/scriptvpn/internal/validator"
 	"github.com/rs/zerolog"
 	"github.com/valyala/fasthttp"
 )

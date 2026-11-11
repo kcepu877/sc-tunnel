@@ -19,8 +19,15 @@ jobs:
         run: |
           echo "Auditing shell script syntax..."
           find . -type f -name "*.sh" -exec bash -n {} \;
+<<<<<<< HEAD
           bash -n uninstall.sh
           bash -n install-api.sh
+=======
+          bash -n install.sh
+          bash -n uninstall.sh
+          bash -n install-api.sh
+          bash -n update.sh
+>>>>>>> 4f16633 (initial commit)
           echo "All shell scripts passed syntax validation successfully!"
 
       - name: Run ShellCheck

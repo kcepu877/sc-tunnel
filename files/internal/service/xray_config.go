@@ -13,8 +13,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/kcepu877/sc-tunnel/internal/config"
-	"github.com/kcepu877/sc-tunnel/internal/model"
+	"github.com/kcepu877/scriptvpn/internal/config"
+	"github.com/kcepu877/scriptvpn/internal/model"
 	"github.com/rs/zerolog"
 )
 
@@ -55,15 +55,15 @@ func isTestMode() bool {
 
 // NewXrayConfigMutator creates a new XrayConfigMutator with group-commit coalescing and debounced reload.
 func NewXrayConfigMutator(cfg *config.Config, logger *zerolog.Logger) *XrayConfigMutator {
-	lockPath := "/run/sc-tunnel-xraycfg.lock"
+	lockPath := "/run/scriptvpn-xraycfg.lock"
 	if isTestMode() || os.Geteuid() != 0 {
 		if cfg != nil && cfg.XrayConfig != "" {
-			lockPath = filepath.Join(filepath.Dir(cfg.XrayConfig), ".sc-tunnel-xraycfg.lock")
+			lockPath = filepath.Join(filepath.Dir(cfg.XrayConfig), ".scriptvpn-xraycfg.lock")
 		} else {
-			lockPath = filepath.Join(os.TempDir(), "sc-tunnel-xraycfg.lock")
+			lockPath = filepath.Join(os.TempDir(), "scriptvpn-xraycfg.lock")
 		}
 	} else if _, err := os.Stat("/run"); err != nil {
-		lockPath = filepath.Join(os.TempDir(), "sc-tunnel-xraycfg.lock")
+		lockPath = filepath.Join(os.TempDir(), "scriptvpn-xraycfg.lock")
 	}
 	return &XrayConfigMutator{
 		cfg:      cfg,
@@ -75,7 +75,7 @@ func NewXrayConfigMutator(cfg *config.Config, logger *zerolog.Logger) *XrayConfi
 func (m *XrayConfigMutator) acquireFlock() (*os.File, func()) {
 	f, err := os.OpenFile(m.lockFile, os.O_CREATE|os.O_RDWR, 0600)
 	if err != nil {
-		alt := filepath.Join(os.TempDir(), "sc-tunnel-xraycfg.lock")
+		alt := filepath.Join(os.TempDir(), "scriptvpn-xraycfg.lock")
 		f, err = os.OpenFile(alt, os.O_CREATE|os.O_RDWR, 0600)
 		if err != nil {
 			return nil, func() {}

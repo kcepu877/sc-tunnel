@@ -15,11 +15,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/kcepu877/sc-tunnel/internal/cache"
-	"github.com/kcepu877/sc-tunnel/internal/config"
-	"github.com/kcepu877/sc-tunnel/internal/model"
-	"github.com/kcepu877/sc-tunnel/internal/repository"
-	"github.com/kcepu877/sc-tunnel/internal/validator"
+	"github.com/kcepu877/scriptvpn/internal/cache"
+	"github.com/kcepu877/scriptvpn/internal/config"
+	"github.com/kcepu877/scriptvpn/internal/model"
+	"github.com/kcepu877/scriptvpn/internal/repository"
+	"github.com/kcepu877/scriptvpn/internal/validator"
 	"github.com/rs/zerolog"
 )
 

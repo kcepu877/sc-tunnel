@@ -1,4 +1,4 @@
-module github.com/kcepu877/sc-tunnel
+module github.com/kcepu877/scriptvpn
 
 go 1.25.0
 

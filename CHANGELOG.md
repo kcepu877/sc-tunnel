@@ -3,13 +3,68 @@
 All notable changes to this project are documented here.
 This project adheres to [Semantic Versioning](https://semver.org/).
 
+<<<<<<< HEAD
+=======
+## [5.6.2] - 2026-11-08
+
+RDNS Integration Hardening, Active Detection & Diagnostics Engine, Collision-Free Interceptor Ports, and 1-Click Preset Setup: **Release 5.6.2**.
+
+### Fixed
+- **Port Conflict Resolution (`0.0.0.0:14053`)**:
+  - Relocated RDNS local DNS interceptor from `5353` to `14053` to prevent fatal port collisions with scriptvpn's native telemetry sniffer (`dnsmasq` on `:5353`) and mDNS resolvers.
+  - Automatically migrates legacy `0.0.0.0:5353` entries in `/etc/rdns/client.yaml` to `0.0.0.0:14053`.
+- **Zero-Domain & Empty Ruleset Crash Fix (`rdns`)**:
+  - Fixed fatal crash on startup when pairing a new exit node with 0 initial domains or an empty `{}` ruleset.
+- **Log File & Strict Mount Hardening**:
+  - Resolved `ProtectSystem=strict` write block by adding `ExecStartPre` to pre-create `/var/log/rdns-client.log` and granting `/var/log` in `ReadWritePaths`.
+  - Added graceful fallback in `rdns-client` to stderr logging if the log file path is unwritable.
+
+### Added
+- **Seamless Backward Compatibility & Auto-Migration Engine (`update.sh`, `scripts/system/update.sh`)**:
+  - Automatically checks existing `/usr/local/bin/rdns-client` version and upgrades to `v0.2.1` whenever update script runs, without touching user's rules or certificates.
+  - Automatically migrates existing `/etc/rdns/client.yaml` from port 5353 to 14053 and restarts `rdns-client` seamlessly if it was active.
+  - Guarantees 100% backward compatibility with existing exit nodes running `rdns-server` v0.2.0 or earlier.
+- **Active Detection & Runtime Health Verification (`rdns-manager`, `menu-rdns`)**:
+  - Replaced silent background subshells with synchronous start/restart, active detection polling (up to 6s), and real-time status diagnostics.
+  - Interactive status checklist verifying daemon PID, DNS interceptor (:14053), SNI interceptor (:14300), QUIC interceptor (:14400), Netfilter TProxy rules, and log stream.
+  - Comprehensive diagnostic dumping from `journalctl -u rdns-client` and `/var/log/rdns-client.log` on any startup issue.
+- **Auto-Bootstrapping Engine**:
+  - Automatically verifies and installs `/usr/local/bin/rdns-client`, `/etc/systemd/system/rdns-client.service`, `python3-pyyaml`, and log directories upon pairing or update.
+- **Instant Preset Setup on Pairing**:
+  - Interactive recommendation prompt immediately after pairing allowing 1-click loading of presets (`streaming`, `malaysia`, `indonesia`, `ai-services`, `ipcheck`).
+- **New Maintenance Tools**:
+  - `rdns-manager update` / `menu-rdns (13)`: On-demand RDNS client binary update and service synchronization tool.
+  - `rdns-manager doctor` / `menu-rdns (12)`: System diagnostic audit tool.
+  - `rdns-manager logs` / `menu-rdns (11)`: Real-time runtime log monitor.
+  - `rdns-manager status`: Full health check and profile route breakdown.
+  - Exit node reachability probe (Online / Offline status badge in node detail view).
+
+## [5.6.1] - 2026-11-06
+
+SmartDNS / RDNS Split Routing Native Integration, Media CDN Direct Bypass (>99% Bandwidth Savings), Safe Non-Destructive Update Engine, and Multi-Distro (EL9/EL10 & Alpine) Support: **Release 5.6.1**.
+
+### Added
+- **Native SmartDNS / RDNS Split Routing (`scripts/menu/menu-rdns.sh`, `scripts/rdns/rdns-manager.sh`, `scripts/rdns/presets/`)**:
+  - Full native menu and CLI manager for domain-based split routing over mTLS Yamux stealth tunnels to exit nodes.
+  - Multi-profile support with modular presets: `streaming` (popular OTT), `malaysia` (all `.my` TLDs, Astro, Sooka, banking), `indonesia` (all `.id` TLDs, BCA, Mandiri, BRI, pajak), `ipcheck`, `google`, `ai-services`, and `social-media`.
+  - Longest-suffix rule evaluation engine with automated collision avoidance and domain simulation test (`rdns-manager test-domain`).
+- **Media CDN Direct Bypass (`cdn_direct: true`)**:
+  - Transparent direct connection for heavy streaming video delivery CDNs (`nflxvideo.net`, `aiv-cdn.net`, `googlevideo.com`, `hotstar-cdn.net`, `byteoversea.com`, etc.), reducing exit node bandwidth consumption by >99% while preserving geo-unblocking and catalog access.
+- **Safe Non-Destructive Update Engine (`update.sh`, `scripts/system/update.sh`)**:
+  - Upgrades all system scripts, shared libraries, API helpers, preset templates, and binaries while strictly guaranteeing existing user JSON configurations (`/etc/xray/config.json`, `/etc/rdns/rules.json`, `/etc/rdns/client.yaml`) and databases (`*.sqlite`) are never overwritten or altered.
+- **Fail-Safe Lifecycle & Multi-OS Compatibility**:
+  - Fixed nftables blackhole on service restart by binding listener ports prior to applying netfilter redirects.
+  - Safe decoupled asynchronous service restart preventing HTTP/API request connection drops.
+  - Added native OpenRC init script support alongside systemd units for Alpine Linux compatibility.
+
+>>>>>>> 4f16633 (initial commit)
 ## [5.6.0] - 2026-11-02
 
-Prebuilt Hardened Static Binaries (`Dropbear 2019.78`, `dnstt-server`, `sc-tunnel`), Multi-Distro Enterprise Linux 9 & 10 Support, Zero-Downtime 100+ Simultaneous Order Burst Engine, Complete Auto-Detect User Login Endpoints, and Deep Security Hardening release: **Release 5.6.0**.
+Prebuilt Hardened Static Binaries (`Dropbear 2019.78`, `dnstt-server`, `scriptvpn`), Multi-Distro Enterprise Linux 9 & 10 Support, Zero-Downtime 100+ Simultaneous Order Burst Engine, Complete Auto-Detect User Login Endpoints, and Deep Security Hardening release: **Release 5.6.0**.
 
 ### Added
 - **Prebuilt Hardened Static Binaries — Zero Compile Time on VPS (`scripts/build/build-dropbear-2019.sh`, `.github/workflows/release.yml`, `bin/`, `install.sh`, `menu-dropbear.sh`, `slowdns.sh`)**:
-  - Automated multi-arch (`linux-amd64` & `linux-arm64`) static builds for **Dropbear `2019.78`** (`dropbear` + `dropbearkey`), **SlowDNS (`dnstt-server`)**, and **`sc-tunnel`**, published both to GitHub Releases and synced into `bin/` with cryptographic SHA-256 verification before extraction and installation.
+  - Automated multi-arch (`linux-amd64` & `linux-arm64`) static builds for **Dropbear `2019.78`** (`dropbear` + `dropbearkey`), **SlowDNS (`dnstt-server`)**, and **`scriptvpn`**, published both to GitHub Releases and synced into `bin/` with cryptographic SHA-256 verification before extraction and installation.
   - Linked static `Dropbear 2019.78` against `musl` + static `libxcrypt 4.4.36` (`--enable-hashes=all`) + `zlib`, providing native `/etc/shadow` password verification for both **EL10 `$y$` (`YESCRYPT`)** and **EL9 `$6$` (`SHA-512`)** without NSS shared-library dependencies or installing `Development Tools`/`gcc` on VPS nodes.
 - **Multi-Distro Enterprise Linux 9 & 10 Support (`install.sh`, `scripts/lib/common.sh`, `fix-firewall.sh`, `optimize-rocky.sh`, `install-api.sh`)**:
   - Full compatibility across **Rocky Linux 9–10**, **RHEL 9–10**, **AlmaLinux 9–10**, and **Oracle Linux 9–10** (`x86_64` & `aarch64`), automatically enabling CRB / CodeReady Builder (including cloud RHUI & Oracle `ol9`/`ol10` repos) and EPEL 9/10 across both DNF4 and DNF5, resolving EL10 `iptables-nft` package changes, and locating `openvpn-plugin-auth-pam.so` dynamically.
@@ -18,7 +73,7 @@ Prebuilt Hardened Static Binaries (`Dropbear 2019.78`, `dnstt-server`, `sc-tunne
   - Added `POST /api/accounts` & `POST /api/trials` (accepting `"protocol"` in JSON body), `POST /api/accounts/{protocol}/{username}/delete`, `DELETE /api/users/{username}`, `POST /api/users/{username}/delete`, and `POST /api/users/{username}/renew`.
 - **Zero-Downtime 100+ Simultaneous Order Burst Engine (`files/internal/service/xray_config.go`, `service/shadow_lock.go`, `config/config.go`, `repository/account.go`)**:
   - Implemented **Leader-Follower Group-Commit Write Coalescing** in `XrayConfigManager` so 100+ simultaneous `POST /api/accounts/{protocol}` requests coalesce into 1 JSON parse + 1 atomic `.tmp` rename + 1 `xray -test` + 1 debounced (`250ms`) `systemctl reload-or-restart xray`.
-  - Implemented `ShadowMutator` (`flock` on `/run/sc-tunnel-shadow.lock` shared with `scripts/lib/account.sh`) batching concurrent SSH user creations into serialized `useradd` + a single batch `chpasswd` pipe so `/etc/passwd` never fails to lock.
+  - Implemented `ShadowMutator` (`flock` on `/run/scriptvpn-shadow.lock` shared with `scripts/lib/account.sh`) batching concurrent SSH user creations into serialized `useradd` + a single batch `chpasswd` pipe so `/etc/passwd` never fails to lock.
   - Added per-connection SQLite DSN pragmas (`busy_timeout(15000)`, `journal_mode(WAL)`, `synchronous(NORMAL)`, `query_only(1)` on reader pool) and DB-first atomic reservation (`409 Conflict` on duplicate concurrent username races).
   - Verified with `Test100SimultaneousOrdersAndAutoDetectUserLogin` (200 simultaneous VLESS + SSH orders at a single barrier gate).
 
@@ -27,7 +82,7 @@ Prebuilt Hardened Static Binaries (`Dropbear 2019.78`, `dnstt-server`, `sc-tunne
   - Enforces DNS-rebinding-proof binary sockaddr SSRF filtering (`netio.c` & `svr-tcpfwd.c`), blocking `direct-tcpip` forwarding to loopback (`127.0.0.0/8`, `0.0.0.0/8`, `::1`, `::`) on all internal control ports (`9000`, `10085`, `81`, `82`, `8081`, etc.) while permitting BadVPN UDPGW (`7100, 7200, 7300`), and blocking cloud metadata IMDS (`169.254.0.0/16`, `fc00::/7`, `fe80::/10`) and private RFC1918/CGNAT networks.
   - Enforces real-time `/etc/shadow` `sp_expire` account expiration inside `fill_passwd()` (`common-session.c`), disables remote port forwarding (`DROPBEAR_SVR_REMOTETCPFWD=0`), agent/X11 forwarding, DSA/3DES/CBC weak ciphers, and reverse-DNS lookup stalls.
 - **OpenSSH, SELinux & Systemd Resilience Hardening**:
-  - Added `/etc/ssh/sshd_config.d/00-sc-tunnel.conf` (preceding cloud-init `50-*.conf` on EL9/EL10) with `PermitTTY no`, `AllowStreamLocalForwarding no`, `PermitTunnel no`, and `GatewayPorts no` for non-root tunnel accounts, plus SELinux `ssh_port_t` registration for port `3303`.
+  - Added `/etc/ssh/sshd_config.d/00-scriptvpn.conf` (preceding cloud-init `50-*.conf` on EL9/EL10) with `PermitTTY no`, `AllowStreamLocalForwarding no`, `PermitTunnel no`, and `GatewayPorts no` for non-root tunnel accounts, plus SELinux `ssh_port_t` registration for port `3303`.
   - Enforced fail-closed SHA-256 verification in `install-api.sh`, `StartLimitIntervalSec=0` + `OOMScoreAdjust=-900` on `api-server.service`, and `proxy_next_upstream off` on Nginx `/api/`.
 
 ## [5.5.0] - 2026-11-02
@@ -50,8 +105,8 @@ Major Enterprise Performance, Multi-Layer Cryptographic Security, SSH All-Protoc
 - **SSH All-Protocol Bandwidth Quota Engine (`scripts/ssh/quota-ssh.sh`, `loop-quota-ssh.service`, `ssh_proto_usage` table, `GET /api/quota/ssh`)**:
   - Real-time monotonic byte accounting and quota enforcement across **OpenSSH (`22, 3303`)**, **Dropbear (`109, 143`)**, **Direct SSH SSL/TLS (`443, 8443`)**, **SSH-WS (`80, 8080, 8888, 443`)**, **SlowDNS (`53, 5300`)**, and **OpenVPN (`1194`)**.
 - **Deep Live Session Telemetry — Accessed Apps/Domains, Transport Protocol, ISP & GeoIP (`GET /api/monitor`, `cek-ssh`, `cek-vless`, `cek-vmess`, `cek-trojan`)**:
-  - Real-time detection of **65+ applications and domains** accessed by connected users (*YouTube, Netflix, TikTok, Instagram, WhatsApp, Telegram, Discord, ChatGPT/OpenAI, Mobile Legends, PUBG, Shopee, Tokopedia*, etc.) via Xray tail-seek log analysis, outbound socket inspection, `nf_conntrack` Virtual IP correlation, and local DNS query telemetry (`dnsmasq-sc-tunnel`).
-  - Automatic **ISP / ASN** and **GeoIP City/Country** enrichment using 3-tier free APIs (`ip-api.com/batch` -> `ipwho.is` -> `freeipapi.com`) with 24-hour RAM and `/run/sc-tunnel-geoip.cache` caching.
+  - Real-time detection of **65+ applications and domains** accessed by connected users (*YouTube, Netflix, TikTok, Instagram, WhatsApp, Telegram, Discord, ChatGPT/OpenAI, Mobile Legends, PUBG, Shopee, Tokopedia*, etc.) via Xray tail-seek log analysis, outbound socket inspection, `nf_conntrack` Virtual IP correlation, and local DNS query telemetry (`dnsmasq-scriptvpn`).
+  - Automatic **ISP / ASN** and **GeoIP City/Country** enrichment using 3-tier free APIs (`ip-api.com/batch` -> `ipwho.is` -> `freeipapi.com`) with 24-hour RAM and `/run/scriptvpn-geoip.cache` caching.
 - **Flash-Sale Bulk Account Provisioning on Standard REST Endpoints (`POST /api/accounts/{protocol}`, `PUT /api/accounts/{protocol}`, `DELETE /api/accounts/{protocol}`, `POST /api/trials/{protocol}`, `scripts/system/add-bulk.sh`)**:
   - Unified single and bulk provisioning directly on standard REST endpoints so existing panels/bots remain 100% compatible while supporting up to **1,000 accounts in 1 single HTTP request** (via `count > 1`, `accounts` array, or top-level JSON array) with single-pass native Go Xray JSON mutation, single Xray reload, single SQLite WAL transaction, single `chpasswd` pipe, and `X-Idempotency-Key` retry deduplication.
   - Added `suspend`, `unsuspend`, `reset-quota`, `kick`, `system/cleanup`, `auth/verify`, `system/ports`, `system/optimize`, `system/services/{service}/{action}`, `system/audit-logs`, and full `vnstat` `/api/bandwidth`.
@@ -363,7 +418,11 @@ First public beta. Developed for **Rocky Linux 9**.
   starting services.
 - Rich, copy-paste-friendly account output (terminal + Telegram HTML) for
   SSH/VLESS/VMESS/Trojan create, trial, and view.
+<<<<<<< HEAD
 - SSH-over-WebSocket via GO-TUNNEL PRO (kcepu877/ws-proxy) static Go
+=======
+- SSH-over-WebSocket via GO-TUNNEL PRO (kcepu877/websocket-proxy) static Go
+>>>>>>> 4f16633 (initial commit)
   binary, tuned for Rocky Linux 9 (`--auth-log /var/log/secure`, runs as root);
   also provides UDPGW on `7300`.
 - Live SSH session monitor (`cek-ssh`): correlates ssh-ws.log bandwidth and
@@ -406,19 +465,23 @@ First public beta. Developed for **Rocky Linux 9**.
   `/etc/xray/backup.pass` (chmod 600); private keys are chmod 600;
   `/etc/xray` is chmod 700.
 - Removed personal names; normalized repository URLs to
-  `github.com/kcepu877/sc-tunnel`.
+  `github.com/kcepu877/scriptvpn`.
 
 ### Removed
 - Legacy `.txt` account files and `config.json` comment markers.
 - Ads Block (helium) menu entry.
 
-[5.6.0]: https://github.com/kcepu877/sc-tunnel/releases/tag/v5.6.0
-[5.5.0]: https://github.com/kcepu877/sc-tunnel/releases/tag/v5.5.0
-[5.4.0]: https://github.com/kcepu877/sc-tunnel/releases/tag/v5.4.0
-[5.3.0]: https://github.com/kcepu877/sc-tunnel/releases/tag/v5.3.0
-[5.2.0]: https://github.com/kcepu877/sc-tunnel/releases/tag/v5.2.0
-[5.0.0]: https://github.com/kcepu877/sc-tunnel/releases/tag/v5.0.0
-[4.0.0]: https://github.com/kcepu877/sc-tunnel/releases/tag/v4.0.0
-[0.3.0-beta]: https://github.com/kcepu877/sc-tunnel/releases/tag/v0.3.0-beta
-[0.2.0-beta]: https://github.com/kcepu877/sc-tunnel/releases/tag/v0.2.0-beta
-[0.1.0-beta]: https://github.com/kcepu877/sc-tunnel/releases/tag/v0.1.0-beta
+<<<<<<< HEAD
+=======
+[5.6.1]: https://github.com/kcepu877/scriptvpn/releases/tag/v5.6.1
+>>>>>>> 4f16633 (initial commit)
+[5.6.0]: https://github.com/kcepu877/scriptvpn/releases/tag/v5.6.0
+[5.5.0]: https://github.com/kcepu877/scriptvpn/releases/tag/v5.5.0
+[5.4.0]: https://github.com/kcepu877/scriptvpn/releases/tag/v5.4.0
+[5.3.0]: https://github.com/kcepu877/scriptvpn/releases/tag/v5.3.0
+[5.2.0]: https://github.com/kcepu877/scriptvpn/releases/tag/v5.2.0
+[5.0.0]: https://github.com/kcepu877/scriptvpn/releases/tag/v5.0.0
+[4.0.0]: https://github.com/kcepu877/scriptvpn/releases/tag/v4.0.0
+[0.3.0-beta]: https://github.com/kcepu877/scriptvpn/releases/tag/v0.3.0-beta
+[0.2.0-beta]: https://github.com/kcepu877/scriptvpn/releases/tag/v0.2.0-beta
+[0.1.0-beta]: https://github.com/kcepu877/scriptvpn/releases/tag/v0.1.0-beta

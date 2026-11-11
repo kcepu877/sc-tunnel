@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kcepu877/sc-tunnel/internal/model"
+	"github.com/kcepu877/scriptvpn/internal/model"
 )
 
 // AccountRepository defines the interface for account & quota database operations.

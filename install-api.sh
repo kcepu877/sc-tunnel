@@ -3,9 +3,13 @@
 # Project: Autoscript VPN by kcepu877
 # Description: Enterprise RESTful API Server Installer & Builder
 # Supported OS: Rocky Linux 9-10, RHEL 9-10, AlmaLinux 9-10, Oracle Linux 9-10
+<<<<<<< HEAD
 # Version: 5.6.0
+=======
+# Version: 5.6.1
+>>>>>>> 4f16633 (initial commit)
 # License: Apache License 2.0 (see LICENSE file)
-# Repository: https://github.com/kcepu877/sc-tunnel
+# Repository: https://github.com/kcepu877/scriptvpn
 # ========================================================
 
 set -e
@@ -47,8 +51,8 @@ API_DB_PATH="$API_DB_DIR/api.db"
 MAIN_DB_PATH="/etc/xray/xray.db"
 
 # GitHub repo for binary downloads
-GITHUB_REPO="kcepu877/sc-tunnel"
-APP_NAME="sc-tunnel"
+GITHUB_REPO="kcepu877/scriptvpn"
+APP_NAME="scriptvpn"
 
 # Install necessary runtime dependencies
 print_info "Checking system utilities..."
@@ -134,7 +138,7 @@ install_binary_from_release() {
     cs_url="$(build_checksum_url "$tag" "$arch_label")"
 
     local tmpdir
-    tmpdir="$(mktemp -d /tmp/sc-tunnel-XXXXXX)"
+    tmpdir="$(mktemp -d /tmp/scriptvpn-XXXXXX)"
     trap 'rm -rf "$tmpdir"' RETURN
 
     local archive="${tmpdir}/${APP_NAME}-${tag}-${arch_label}.tar.gz"
@@ -207,7 +211,7 @@ install_binary_from_release() {
 
     # Install binary
     install -m 0755 "$extracted_bin" "$INSTALL_PATH"
-    ln -sf "$INSTALL_PATH" /usr/local/bin/sc-tunnel
+    ln -sf "$INSTALL_PATH" /usr/local/bin/scriptvpn
 
     print_ok "Binary installed: $INSTALL_PATH (${tag} / ${arch_label})"
     return 0
@@ -284,8 +288,8 @@ if [[ $BINARY_INSTALLED -eq 0 ]]; then
 
             if [[ -f "$INSTALL_PATH" ]]; then
                 chmod +x "$INSTALL_PATH"
-                # Link also as sc-tunnel
-                ln -sf "$INSTALL_PATH" /usr/local/bin/sc-tunnel
+                # Link also as scriptvpn
+                ln -sf "$INSTALL_PATH" /usr/local/bin/scriptvpn
                 BINARY_INSTALLED=1
                 print_ok "API binary compiled and installed: $INSTALL_PATH"
             fi
@@ -306,8 +310,12 @@ fi
 print_info "Installing systemd service..."
 cat >"$SERVICE_FILE" <<'EOF'
 [Unit]
+<<<<<<< HEAD
 Description=Autoscript VPN Enterprise API Server (v5.6.0)
-Documentation=https://github.com/kcepu877/sc-tunnel
+=======
+Description=Autoscript VPN Enterprise API Server (v5.6.1)
+>>>>>>> 4f16633 (initial commit)
+Documentation=https://github.com/kcepu877/scriptvpn
 After=network.target xray.service dropbear.service
 Wants=network-online.target
 StartLimitIntervalSec=0
@@ -397,7 +405,11 @@ echo ""
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${GREEN}${BOLD}           API SERVER INSTALLATION SUCCESSFUL!              ${NC}"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+<<<<<<< HEAD
 echo -e " ${WHITE}Version${NC}         : ${CYAN}${LATEST_TAG:-v5.6.0}${NC}"
+=======
+echo -e " ${WHITE}Version${NC}         : ${CYAN}${LATEST_TAG:-v5.6.1}${NC}"
+>>>>>>> 4f16633 (initial commit)
 echo -e " ${WHITE}Security Mode${NC}   : ${GREEN}STRICT (5-Layer SHA-256 + HMAC-SHA256)${NC}"
 echo -e " ${WHITE}Endpoint Local${NC}  : ${CYAN}http://127.0.0.1:9000${NC}"
 echo -e " ${WHITE}Endpoint Public${NC} : ${CYAN}https://${DOMAIN}${NC}"

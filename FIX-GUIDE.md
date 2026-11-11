@@ -1,6 +1,6 @@
 # Fix Guide: Hide Response Headers from ISP Scanners
 
-This guide is for servers **already installed** with sc-tunnel v0.2.0-beta.
+This guide is for servers **already installed** with scriptvpn v0.2.0-beta.
 It makes the domain show minimal information when scanned — no HTTP status
 line, no `Server` header, no `Upgrade: websocket` response.
 
@@ -114,7 +114,7 @@ nginx -t && systemctl reload nginx
 
 ## Note
 
-- This fix is included by default in **sc-tunnel v0.2.1-beta+**.
+- This fix is included by default in **scriptvpn v0.2.1-beta+**.
 - No extra packages or repos needed — `return 444` is built into Nginx.
 - The `server_tokens off;` in `/etc/nginx/nginx.conf` already hides the
   Nginx version number from the `Server` header.

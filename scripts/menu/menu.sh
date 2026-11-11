@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 # ========================================================
+<<<<<<< HEAD
 # Project: Autoscript VPN by vvip
+=======
+# Project: Autoscript VPN by kcepu877
+>>>>>>> 4f16633 (initial commit)
 # Description: AutoScript VPN & Tunneling Management System
 # Developed for Rocky Linux 9
 # ========================================================
@@ -171,8 +175,19 @@ IPVPS=$(curl -s --max-time 3 ifconfig.me 2>/dev/null || echo "N/A")
 
 
 # --- MAIN MENU ---
+<<<<<<< HEAD
 clear
 ui_header "ENTERPRISE VPN MANAGER"
+=======
+SCRIPT_VER="5.6.1"
+if [[ -f /usr/local/sbin/VERSION ]]; then
+  SCRIPT_VER=$(tr -d '[:space:]' < /usr/local/sbin/VERSION)
+fi
+
+clear
+ui_header "ENTERPRISE VPN MANAGER (v${SCRIPT_VER})"
+ui_kv "Version"  "v${SCRIPT_VER}" "$GREEN"
+>>>>>>> 4f16633 (initial commit)
 ui_kv "OS"       "$OS1"
 ui_kv "IP"       "$IPVPS"
 ui_kv "Domain"   "$DOMAIN"
@@ -183,6 +198,7 @@ ui_kv "Traffic"  "$ttoday / $tyest / $tmon  (day/yest/mon)"
 ui_rule
 printf " ${WHITE}%-12s${NC} ${CYAN}:${NC} SSH ${PINK}[${GREEN}%s${PINK}]${NC}  VLESS ${PINK}[${GREEN}%s${PINK}]${NC}  VMESS ${PINK}[${GREEN}%s${PINK}]${NC}  TROJAN ${PINK}[${GREEN}%s${PINK}]${NC}  NOOBZ ${PINK}[${GREEN}%s${PINK}]${NC}\n" "Accounts" "$ssh1" "$vls" "$vms" "$tro" "$nbz"
 ui_rule
+<<<<<<< HEAD
 # 2-kolom status
 ui_status2() {
   local n1="$1" b1="$2" n2="$3" b2="$4"
@@ -223,6 +239,41 @@ ui_rule
 ui_center "$xray_version"
 ui_foot
 ui_rule
+=======
+ui_label "SERVICES"
+ui_status "SSH + WS"  "$resshws"
+[[ -s /etc/slowdns/server.pub ]] && ui_status "SlowDNS"   "$(svc_badge slowdns)"
+ui_status "Xray Core" "$resv2r"
+ui_status "Nginx"     "$resngx"
+ui_status "HAProxy"   "$reshap"
+ui_status "OpenVPN"   "$resovpn"
+ui_status "Squid"     "$ressquid"
+[[ -x /usr/bin/noobzvpns ]] && ui_status "NoobzVPN" "$resnbz"
+ui_status "API"       "$resapi"
+[[ -f /etc/rdns/client.yaml ]] && ui_status "RDNS Tunnel" "$(svc_badge rdns-client)"
+ui_rule
+ui_label "ACCOUNT PANELS"
+ui_opt 1 "SSH / OpenVPN Panel"
+ui_opt 2 "VLESS Panel (WS/HU/XHTTP/gRPC)"
+ui_opt 3 "VMESS Panel (WS/HU/XHTTP/gRPC)"
+ui_opt 4 "TROJAN Panel (WS/HU/XHTTP/gRPC)"
+ui_opt 5 "NoobzVPN Panel (TCP/WS)"
+ui_rule
+ui_label "TOOLS"
+ui_opt 6 "Auto Bulk Create"
+ui_opt 7 "Account Cleaner"
+ui_opt 8 "User Checker"
+ui_opt 9 "API Menu"
+ui_rule
+ui_label "SERVER"
+ui_opt 10 "System Menu"
+ui_opt 11 "Backup / Restore"
+ui_opt 12 "RDNS Client (mTLS Stealth Tunnel)"
+ui_opt x  "Exit"
+ui_rule
+ui_kv "Xray" "$xray_version"
+ui_foot
+>>>>>>> 4f16633 (initial commit)
 
 # --- MENU SELECTION ---
 read -p " Select Option : " mm
@@ -239,9 +290,16 @@ case $mm in
 10) clear ; run_cc ; menu-system ;;
 11) clear ; run_cc ; menu-backup ;;
 12) clear ; run_cc ; menu-rdns ;;
+<<<<<<< HEAD
 xx) clear ; reboot ;;
+=======
+>>>>>>> 4f16633 (initial commit)
 x|X) clear ; exit 0 ;;
 u|U|update) clear ; run_cc ; update ;;
 00) clear ; run_cc ; change-banner ;;
 *) echo "Invalid option, please try again." ; sleep 1 ; menu ;;
+<<<<<<< HEAD
 esac
+=======
+esac
+>>>>>>> 4f16633 (initial commit)

@@ -3,7 +3,7 @@
 # Project: Autoscript VPN by kcepu877
 # Description: Log maintenance (cap sizes; keep recent data for live telemetry)
 # License: Apache License 2.0 (see LICENSE file)
-# Repository: https://github.com/kcepu877/sc-tunnel
+# Repository: https://github.com/kcepu877/scriptvpn
 # ========================================================
 # Retain recent tail lines in logs used by live session, IP-limit, and
 # app/domain telemetry monitors while preventing unbounded disk/RAM growth.
@@ -25,7 +25,7 @@ cap_log_tail() {
 : > /var/log/xray/error.log 2>/dev/null
 
 cap_log_tail /var/log/xray/access.log 5000
-cap_log_tail /var/log/sc-tunnel-dns.log 4000
+cap_log_tail /var/log/scriptvpn-dns.log 4000
 cap_log_tail /var/log/secure 3000
 cap_log_tail /var/log/auth.log 3000
 cap_log_tail /var/log/ssh-ws.log 5000

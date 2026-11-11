@@ -3,11 +3,19 @@
 # Project: Autoscript VPN by kcepu877
 # Description: AutoScript VPN & Tunneling Management System
 # Supported OS: Rocky Linux 9-10, RHEL 9-10, AlmaLinux 9-10, Oracle Linux 9-10
+<<<<<<< HEAD
 # Version: 5.6.0
 # License: Apache License 2.0 (see LICENSE file)
-# Repository: https://github.com/kcepu877/sc-tunnel
+# Repository: https://github.com/kcepu877/scriptvpn
 # ========================================================
 AS_VERSION="5.6.0"
+=======
+# Version: 5.6.1
+# License: Apache License 2.0 (see LICENSE file)
+# Repository: https://github.com/kcepu877/scriptvpn
+# ========================================================
+AS_VERSION="5.6.1"
+>>>>>>> 4f16633 (initial commit)
 # --- Color Definitions ---
 NC='\033[0m'
 RED='\033[0;31m'
@@ -246,7 +254,11 @@ sleep 1
 enable_el_repositories
 
 print_info "Installing core dependencies..."
+<<<<<<< HEAD
 dnf install -y wget curl openssl sudo binutils coreutils gnupg2 bc htop lsof jq sqlite tar gzip bzip2 xz unzip python3 util-linux policycoreutils policycoreutils-python-utils >/dev/null 2>&1
+=======
+dnf install -y wget curl openssl sudo binutils coreutils gnupg2 bc htop lsof jq sqlite tar gzip bzip2 xz unzip python3 python3-pyyaml util-linux policycoreutils policycoreutils-python-utils >/dev/null 2>&1
+>>>>>>> 4f16633 (initial commit)
 dnf install -y vnstat ruby rubygems >/dev/null 2>&1 || true
 command -v gem >/dev/null 2>&1 && gem install lolcat >/dev/null 2>&1 || true
 if systemctl list-unit-files vnstat.service >/dev/null 2>&1; then
@@ -270,8 +282,12 @@ fi
 mkdir -p /etc/ssh/sshd_config.d
 # On EL9/EL10, /etc/ssh/sshd_config.d/*.conf is evaluated in lexical order and
 # first-match wins over cloud-init's 50-cloud-init.conf (PasswordAuthentication no).
-cat >/etc/ssh/sshd_config.d/00-sc-tunnel.conf <<'EOF'
+cat >/etc/ssh/sshd_config.d/00-scriptvpn.conf <<'EOF'
+<<<<<<< HEAD
 # Autoscript v5.6.0 Hardened OpenSSH Configuration (EL9 & EL10)
+=======
+# Autoscript v5.6.1 Hardened OpenSSH Configuration (EL9 & EL10)
+>>>>>>> 4f16633 (initial commit)
 Port 22
 Port 3303
 PermitRootLogin yes
@@ -294,7 +310,7 @@ Match User *,!root
     GatewayPorts no
     PermitTTY no
 EOF
-chmod 600 /etc/ssh/sshd_config.d/00-sc-tunnel.conf
+chmod 600 /etc/ssh/sshd_config.d/00-scriptvpn.conf
 if [[ -f /etc/ssh/sshd_config ]]; then
   sed -i 's/^#*PasswordAuthentication.*/PasswordAuthentication yes/g' /etc/ssh/sshd_config
   sed -i 's/^#*PermitRootLogin.*/PermitRootLogin yes/g' /etc/ssh/sshd_config
@@ -320,7 +336,7 @@ print_success "nologin shell registered."
 print_info "Configuring rsyslog for /var/log/secure..."
 dnf install rsyslog -y >/dev/null 2>&1
 if ! grep -rqs 'authpriv\.\*' /etc/rsyslog.conf /etc/rsyslog.d/ 2>/dev/null; then
-  echo 'authpriv.*    /var/log/secure' >/etc/rsyslog.d/00-sc-tunnel-secure.conf
+  echo 'authpriv.*    /var/log/secure' >/etc/rsyslog.d/00-scriptvpn-secure.conf
 fi
 systemctl enable rsyslog --now >/dev/null 2>&1
 systemctl restart rsyslog >/dev/null 2>&1
@@ -337,7 +353,7 @@ print_success "Directories created."
 
 # Copy Menu
 REPO_OWNER="kcepu877"
-REPO_NAME="sc-tunnel"
+REPO_NAME="scriptvpn"
 REPO_BRANCH="${REPO_BRANCH:-main}"
 REPO_TARBALL="https://github.com/${REPO_OWNER}/${REPO_NAME}/archive/refs/heads/${REPO_BRANCH}.tar.gz"
 
@@ -375,24 +391,95 @@ menu_install_logic() {
     install -m 0755 "$file" "/usr/local/sbin/api/$name"
   done
 
+<<<<<<< HEAD
   # Install RDNS presets into /usr/local/sbin/rdns/presets and /etc/rdns/presets
   if [[ -d "$srcdir/scripts/rdns/presets" ]]; then
     mkdir -p /usr/local/sbin/rdns/presets /etc/rdns/presets
+=======
+  # Install RDNS presets and ensure directories
+  mkdir -p /usr/local/sbin/rdns/presets /etc/rdns/presets /etc/rdns/certs /var/log
+  touch /var/log/rdns-client.log && chmod 644 /var/log/rdns-client.log 2>/dev/null || true
+  if [[ -d "$srcdir/scripts/rdns/presets" ]]; then
+>>>>>>> 4f16633 (initial commit)
     cp -rf "$srcdir/scripts/rdns/presets/"*.json /usr/local/sbin/rdns/presets/ 2>/dev/null || true
     cp -rf "$srcdir/scripts/rdns/presets/"*.json /etc/rdns/presets/ 2>/dev/null || true
   fi
 
-  # Cache prebuilt hardened binaries (Dropbear 2019.78, dnstt-server) locally if bundled
-  if [[ -d "$srcdir/bin" ]]; then
-    mkdir -p /usr/local/share/sc-tunnel/bin
-    cp -rf "$srcdir/bin/"* /usr/local/share/sc-tunnel/bin/ 2>/dev/null || true
-  fi
-  if [[ -f "$srcdir/scripts/build/build-dropbear-2019.sh" ]]; then
-    mkdir -p /usr/local/share/sc-tunnel/build
-    install -m 0755 "$srcdir/scripts/build/build-dropbear-2019.sh" /usr/local/share/sc-tunnel/build/build-dropbear-2019.sh
+<<<<<<< HEAD
+=======
+  # Install rdns-client systemd service template
+  if command -v systemctl &>/dev/null; then
+    cat > /etc/systemd/system/rdns-client.service <<'EOF_RDNS_SVC'
+[Unit]
+Description=rdns-client (decision node: split DNS + SNI traffic router)
+Documentation=https://github.com/kcepu877/rdns
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+ExecStartPre=-/bin/sh -c 'mkdir -p /var/log /etc/rdns/certs && touch /var/log/rdns-client.log && chmod 644 /var/log/rdns-client.log 2>/dev/null || true'
+ExecStart=/usr/local/bin/rdns-client -config /etc/rdns/client.yaml
+ExecReload=/bin/kill -HUP $MAINPID
+SyslogIdentifier=rdns-client
+ProtectSystem=strict
+ReadWritePaths=/var/log /var/log/rdns-client.log /etc/rdns
+ProtectHome=true
+PrivateTmp=true
+LimitNOFILE=65536
+Restart=always
+RestartSec=3
+TimeoutStopSec=15
+ExecStopPost=-/usr/sbin/nft delete table ip rdns
+ExecStopPost=-/usr/sbin/nft delete table ip6 rdns
+
+[Install]
+WantedBy=multi-user.target
+EOF_RDNS_SVC
+    systemctl daemon-reload >/dev/null 2>&1 || true
+    systemctl enable rdns-client >/dev/null 2>&1 || true
   fi
 
+  # Ensure static rdns-client binary is installed
+  if [[ ! -x /usr/local/bin/rdns-client ]]; then
+    local r_arch=""
+    case "$(uname -m)" in
+      x86_64|amd64) r_arch="amd64" ;;
+      aarch64|arm64) r_arch="arm64" ;;
+    esac
+    if [[ -n "$r_arch" ]]; then
+      if [[ -x "$srcdir/bin/rdns-client-linux-${r_arch}" ]]; then
+        cp -f "$srcdir/bin/rdns-client-linux-${r_arch}" /usr/local/bin/rdns-client
+        chmod 755 /usr/local/bin/rdns-client
+      elif [[ -x "/home/kcepu877/Project-Real/rdns/dist/rdns-client-linux-${r_arch}" ]]; then
+        cp -f "/home/kcepu877/Project-Real/rdns/dist/rdns-client-linux-${r_arch}" /usr/local/bin/rdns-client
+        chmod 755 /usr/local/bin/rdns-client
+      else
+        curl -sSL --connect-timeout 10 --max-time 30 -o /usr/local/bin/rdns-client \
+          "https://github.com/kcepu877/rdns/releases/download/v0.2.1/rdns-client-linux-${r_arch}" 2>/dev/null || true
+        chmod 755 /usr/local/bin/rdns-client 2>/dev/null || true
+      fi
+    fi
+  fi
+
+>>>>>>> 4f16633 (initial commit)
+  # Cache prebuilt hardened binaries (Dropbear 2019.78, dnstt-server) locally if bundled
+  if [[ -d "$srcdir/bin" ]]; then
+    mkdir -p /usr/local/share/scriptvpn/bin
+    cp -rf "$srcdir/bin/"* /usr/local/share/scriptvpn/bin/ 2>/dev/null || true
+  fi
+  if [[ -f "$srcdir/scripts/build/build-dropbear-2019.sh" ]]; then
+    mkdir -p /usr/local/share/scriptvpn/build
+    install -m 0755 "$srcdir/scripts/build/build-dropbear-2019.sh" /usr/local/share/scriptvpn/build/build-dropbear-2019.sh
+  fi
+
+<<<<<<< HEAD
   # Install the API, Uninstaller & Updater helper commands[[ -f "$srcdir/install-api.sh" ]] && install -m 0755 "$srcdir/install-api.sh" /usr/local/sbin/install-api
+=======
+  # Install the API, Uninstaller & Updater helper commands
+  [[ -f "$srcdir/install-api.sh" ]] && install -m 0755 "$srcdir/install-api.sh" /usr/local/sbin/install-api
+>>>>>>> 4f16633 (initial commit)
   [[ -f "$srcdir/uninstall-api.sh" ]] && install -m 0755 "$srcdir/uninstall-api.sh" /usr/local/sbin/uninstall-api
   [[ -f "$srcdir/uninstall.sh" ]] && install -m 0755 "$srcdir/uninstall.sh" /usr/local/sbin/uninstall
   if [[ -f "$srcdir/update.sh" ]]; then
@@ -401,7 +488,11 @@ menu_install_logic() {
     install -m 0755 "$srcdir/scripts/system/update.sh" /usr/local/sbin/update
   fi
   ln -sf /usr/local/sbin/update /usr/local/sbin/update-script 2>/dev/null || true
+<<<<<<< HEAD
   ln -sf /usr/local/sbin/update /usr/local/sbin/autoscript-update 2>/dev/null || true
+=======
+  ln -sf /usr/local/sbin/update /usr/local/sbin/scriptvpn-update 2>/dev/null || true
+>>>>>>> 4f16633 (initial commit)
   [[ -f "$srcdir/VERSION" ]] && cp -f "$srcdir/VERSION" /usr/local/sbin/VERSION 2>/dev/null || true
 
   rm -rf "$tmpdir"
@@ -519,7 +610,7 @@ dropbear_install_logic() {
 
     local -a candidate_pairs=(
       "${script_dir}/bin/${archive_name}|${script_dir}/bin/${sha_name}"
-      "/usr/local/share/sc-tunnel/bin/${archive_name}|/usr/local/share/sc-tunnel/bin/${sha_name}"
+      "/usr/local/share/scriptvpn/bin/${archive_name}|/usr/local/share/scriptvpn/bin/${sha_name}"
       "https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/latest/download/${archive_name}|https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/latest/download/${sha_name}"
       "https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/${REPO_BRANCH}/bin/${archive_name}|https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/${REPO_BRANCH}/bin/${sha_name}"
     )
@@ -659,7 +750,11 @@ clear
 cd /root
 rm -fr dropbear*
 
+<<<<<<< HEAD
 # Install SSH-over-WebSocket proxy: GO-TUNNEL PRO (kcepu877/ws-proxy)
+=======
+# Install SSH-over-WebSocket proxy: GO-TUNNEL PRO (kcepu877/websocket-proxy)
+>>>>>>> 4f16633 (initial commit)
 # Static Go binary (CGO_ENABLED=0) — runs natively on Rocky Linux 9.
 # Tuned for EL9: auth log = /var/log/secure (not Debian's /var/log/auth.log),
 # runs as root (EL9 has no 'adm' group on /var/log/secure).
@@ -680,7 +775,11 @@ sshws_install_logic() {
   esac
   asset="ssh-ws-${SSHWS_VERSION}-${arch}.tar.gz"
 
+<<<<<<< HEAD
   local base="https://github.com/kcepu877/ws-proxy/releases/download/${SSHWS_VERSION}"
+=======
+  local base="https://github.com/kcepu877/websocket-proxy/releases/download/${SSHWS_VERSION}"
+>>>>>>> 4f16633 (initial commit)
   local tmp
   tmp="$(mktemp -d)"
 
@@ -1238,6 +1337,10 @@ EOF
     mkdir -p /usr/local/bin /usr/local/share/xray
     unzip -oq "${xray_tmp}/${xray_zip}" -d "$xray_tmp/extracted"
     install -m 0755 "$xray_tmp/extracted/xray" /usr/local/bin/xray
+<<<<<<< HEAD
+=======
+    restorecon -F /usr/local/bin/xray 2>/dev/null || chcon -t bin_t /usr/local/bin/xray 2>/dev/null || true
+>>>>>>> 4f16633 (initial commit)
     [[ -f "$xray_tmp/extracted/geoip.dat" ]] && install -m 0644 "$xray_tmp/extracted/geoip.dat" /usr/local/share/xray/geoip.dat
     [[ -f "$xray_tmp/extracted/geosite.dat" ]] && install -m 0644 "$xray_tmp/extracted/geosite.dat" /usr/local/share/xray/geosite.dat
     print_success "Xray-core ${xray_ver} SHA-256 verified and installed."
@@ -1675,8 +1778,13 @@ server {
 
 # Dedicated HTTP/2 server block for gRPC, XHTTP, and HTTPUpgrade
 server {
+<<<<<<< HEAD
     listen 127.0.0.1:82 default_server proxy_protocol http2;
     
+=======
+    listen 127.0.0.1:82 default_server proxy_protocol;
+    http2 on;
+>>>>>>> 4f16633 (initial commit)
     server_name ${domain};
 
     # gRPC inbounds
@@ -1838,6 +1946,7 @@ fi
 haproxy_install_logic() {
   print_info "Configuring HAProxy Enterprise Balancing..."
   dnf install haproxy -y >/dev/null 2>&1
+<<<<<<< HEAD
   
   sudo mkdir -p /etc/systemd/system/haproxy.service.d
 sudo tee /etc/systemd/system/haproxy.service.d/20-runtime-dir.conf > /dev/null <<'EOF'
@@ -1845,6 +1954,9 @@ sudo tee /etc/systemd/system/haproxy.service.d/20-runtime-dir.conf > /dev/null <
 RuntimeDirectory=haproxy
 RuntimeDirectoryMode=0750
 EOF
+=======
+
+>>>>>>> 4f16633 (initial commit)
   mkdir -p /etc/haproxy /run/haproxy
   cat /etc/xray/xray.crt /etc/xray/xray.key | tee /etc/haproxy/haproxy.pem >/dev/null
   chmod 600 /etc/haproxy/haproxy.pem
@@ -2190,7 +2302,7 @@ api_server_install_logic() {
     ./cmd/server/main.go
 
   chmod +x /usr/local/bin/api-server
-  ln -sf /usr/local/bin/api-server /usr/local/bin/sc-tunnel
+  ln -sf /usr/local/bin/api-server /usr/local/bin/scriptvpn
 
   mkdir -p /etc/api
   chmod 700 /etc/api
@@ -2421,7 +2533,10 @@ EOF
   firewall-cmd --add-masquerade --permanent >/dev/null 2>&1 || true
   firewall-cmd --reload >/dev/null 2>&1 || true
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 4f16633 (initial commit)
   systemctl enable openvpn-server@server-tcp-1194 >/dev/null 2>&1
   systemctl restart openvpn-server@server-tcp-1194 >/dev/null 2>&1
   check_service "openvpn-server@server-tcp-1194" || print_warn "OpenVPN TCP not active."
@@ -2617,6 +2732,7 @@ SELF="$(readlink -f "$0" 2>/dev/null)"
 cd /root 2>/dev/null
 [[ -n "$SELF" && -f "$SELF" ]] && rm -f "$SELF" 2>/dev/null
 rm -f /root/install.sh /root/uninstall.sh 2>/dev/null
+<<<<<<< HEAD
 cat >>/root/.bashrc <<'EOF'
 
 # Auto-launch menu on first login
@@ -2632,3 +2748,6 @@ EOF
 sync
 sleep 5
 reboot
+=======
+exit 0
+>>>>>>> 4f16633 (initial commit)

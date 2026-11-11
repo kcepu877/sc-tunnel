@@ -1,5 +1,6 @@
 # Autoscript VPN
 
+<<<<<<< HEAD
 > Version: **5.6.0** (Enterprise Release — EL9 & EL10) — see [CHANGELOG.md](CHANGELOG.md).
 
 AutoScript VPN & Tunneling Management System, engineered and extremized for **Enterprise Linux 9 & 10** (**Rocky Linux 9–10**, **RHEL 9–10**, **AlmaLinux 9–10**, **Oracle Linux 9–10**).
@@ -10,7 +11,21 @@ Enterprise-grade multi-protocol tunneling platform supporting **SSH All-Protocol
 
 ## Key Features (v5.6.0)
 
-- **Prebuilt Hardened Binaries (Zero VPS Compile Time)**: Ships cryptographically SHA-256-verified static binaries for **`Dropbear 2019.78`** (`dropbear` + `dropbearkey` linked with static `libxcrypt` supporting both EL9 `$6$` SHA-512 and EL10 `$y$` YESCRYPT, compile-time SSRF/IMDS/loopback isolation, and real-time `/etc/shadow` `sp_expire` enforcement), **`dnstt-server`** (SlowDNS), and **`sc-tunnel`** (`linux-amd64` & `linux-arm64`) — installs in ~1–2 seconds without installing GCC or Go on the VPS.
+=======
+> Version: **5.6.1** (Enterprise Release — EL9 & EL10) — see [CHANGELOG.md](CHANGELOG.md).
+
+AutoScript VPN & Tunneling Management System, engineered and extremized for **Enterprise Linux 9 & 10** (**Rocky Linux 9–10**, **RHEL 9–10**, **AlmaLinux 9–10**, **Oracle Linux 9–10**).
+
+Enterprise-grade multi-protocol tunneling platform supporting **SSH All-Protocol** (OpenSSH, Prebuilt Hardened Dropbear 2019.78, Direct SSH SSL/TLS, SSH-WS, Prebuilt SlowDNS DNSTT, OpenVPN), **NoobzVPN**, **VLESS**, **VMESS**, and **Trojan** with full WebSocket (`ws`), HTTPUpgrade (`hu`), XHTTP (`xhttp`), and gRPC transport matrix, **SmartDNS / RDNS Split Routing** with media CDN direct bypass (>99% bandwidth savings), fronted by HAProxy + Nginx HTTP/1.1 & HTTP/2, extreme 1 vCPU / 1 GB RAM kernel/ZRAM optimization, and a zero-downtime high-concurrency **Go RESTful API daemon** protected by **5-Layer Strict SHA-256 + Canonical HMAC-SHA256 verification**.
+
+---
+
+## Key Features (v5.6.1)
+
+- **SmartDNS / RDNS Split Routing & Transparent Traffic Engine**: Integrated transparent decision node routing (`menu-rdns` & `rdns-manager`) that routes chosen country domains (such as `.my` TLDs, Malaysian/Indonesian banking, and streaming OTT) through mTLS Yamux stealth tunnels to exit nodes while automatically streaming heavy video chunks direct (`cdn_direct: true`), preserving >99% bandwidth.
+- **Safe Non-Destructive Update Engine**: Updates menus, libraries, helpers, systemd templates, and presets without ever modifying or overwriting existing user databases (`*.sqlite`) or custom JSON configurations (`config.json`, `rules.json`).
+>>>>>>> 4f16633 (initial commit)
+- **Prebuilt Hardened Binaries (Zero VPS Compile Time)**: Ships cryptographically SHA-256-verified static binaries for **`Dropbear 2019.78`** (`dropbear` + `dropbearkey` linked with static `libxcrypt` supporting both EL9 `$6$` SHA-512 and EL10 `$y$` YESCRYPT, compile-time SSRF/IMDS/loopback isolation, and real-time `/etc/shadow` `sp_expire` enforcement), **`dnstt-server`** (SlowDNS), and **`scriptvpn`** (`linux-amd64` & `linux-arm64`) — installs in ~1–2 seconds without installing GCC or Go on the VPS.
 - **Multi-Distro Enterprise Linux 9 & 10 Support**: Native support across **Rocky Linux 9–10**, **RHEL 9–10**, **AlmaLinux 9–10**, and **Oracle Linux 9–10** (`x86_64` & `aarch64`), automatically configuring CRB / CodeReady Builder + EPEL 9/10 across DNF4 and DNF5.
 - **Zero-Downtime Simultaneous Order Burst Engine**: Handles **100+ simultaneous buyer orders** at the exact same millisecond with zero `SQLITE_BUSY`, zero `/etc/passwd` lock failures, and zero Xray restart storms via **Leader-Follower Group-Commit Xray Write Coalescing**, **Cross-Process `flock` Batch `/etc/shadow` Mutation**, **DB-First Atomic Reservation**, and **SQLite WAL `busy_timeout(15000)`**.
 - **Complete Standard REST Endpoints & Auto-Detect User Login**: Full Create (`POST /api/accounts/{protocol}`, `POST /api/accounts`), Delete (`DELETE /api/accounts/{protocol}/{username}`, `DELETE /api/users/{username}`), Renew (`POST /api/accounts/{protocol}/{username}/renew`, `POST /api/users/{username}/renew`), and **Auto-Detect User Login & All Information** (`GET /api/users/{username}/login`, `GET /api/users/{username}`) returning online state, auto-detected protocol(s), transport, IPs, ISP, GeoIP, accessed apps/domains, quota breakdown, and connection `config` links.
@@ -49,7 +64,7 @@ Every systemd service (`xray`, `api-server`, `dropbear`, `sshd`, `ssh-ws`, `ngin
 
 | Protocol / Service | Network / Security | Public Port(s) | Path / Endpoint | Internal Routing / Backend | Quota & Live Monitor |
 |---|---|---|---|---|---|
-| **OpenSSH Direct** | Raw SSH (`TCP`) | `22`, `3303` / TCP | Direct SSH | `sshd.service` (`00-sc-tunnel.conf`, `PermitTTY no`) | Tracked (`openssh`) |
+| **OpenSSH Direct** | Raw SSH (`TCP`) | `22`, `3303` / TCP | Direct SSH | `sshd.service` (`00-scriptvpn.conf`, `PermitTTY no`) | Tracked (`openssh`) |
 | **Dropbear 2019.78 Direct** | Raw SSH (`TCP`) | `109`, `143` / TCP | Direct SSH (`SSH-2.0-dropbear_2019.78`) | `dropbear.service` (Prebuilt Hardened Static) | Tracked (`dropbear`) |
 | **Direct SSH SSL/TLS** *(Stunnel Mode)* | `TLS 1.2 / 1.3` (`TCP`) | `443`, `8443` / TCP *(+ CDN TLS: `2053, 2083, 2087, 2096`)* | Raw SSH over TLS (SNI) | HAProxy `:443/:8443` TLS → `127.0.0.1:109` (Dropbear) | Tracked (`ssh_ssl`) |
 | **SSH WebSocket HTTP** *(Payload / CDN)* | `WS` (`HTTP` / `none`) | `80`, `8080`, `8888` / TCP *(+ Firewall/CDN HTTP: `8880, 2052, 2082, 2086, 2095`)* | `/ssh` or `/` *(Injector Payload)* | HAProxy `:80/:8080` → Nginx `:81` → `ssh-ws` (`:8888`) → `:109` | Tracked (`ssh_ws`) |
@@ -85,7 +100,7 @@ All Xray protocols share unified TLS termination on `:443` / `:8443` (ALPN `h2, 
 | Component | Bind / Public Access | Purpose & Security Isolation |
 |---|---|---|
 | **Enterprise REST API (Public)** | `https://<domain>/api/*` (`:443, :8443` H1/H2 & `:80, :8080`) | Reverse-proxied via HAProxy → Nginx (`upstream api_backend` keepalive 256, `proxy_next_upstream off`) |
-| **`sc-tunnel` Daemon** | `127.0.0.1:9000` | Protected by 5-Layer SHA-256 + HMAC-SHA256, firewall-closed externally, blocked from tunnel UIDs & Dropbear SSRF |
+| **`scriptvpn` Daemon** | `127.0.0.1:9000` | Protected by 5-Layer SHA-256 + HMAC-SHA256, firewall-closed externally, blocked from tunnel UIDs & Dropbear SSRF |
 | **Nginx Reverse Proxy** | `127.0.0.1:81` (HTTP/1.1) & `127.0.0.1:82` (HTTP/2) | `proxy_protocol` listeners fed exclusively by local HAProxy |
 | **Xray StatsService gRPC** | `127.0.0.1:10085` | Per-user uplink/downlink byte counters (`dokodemo-door` `api` tag) |
 | **SSH-WS Metrics API** | `127.0.0.1:8081` | Local session & UDPGW telemetry for `ssh-ws` |
@@ -109,17 +124,17 @@ All Xray protocols share unified TLS termination on `:443` / `:8443` (ALPN `h2, 
 
 ### 1-Line Installation Command (EL9 & EL10)
 ```bash
-dnf install -y wget curl openssl && curl -fsSL --proto '=https' --tlsv1.2 -o install.sh https://raw.githubusercontent.com/kcepu877/sc-tunnel/main/install.sh && chmod +x install.sh && ./install.sh
+dnf install -y wget curl openssl && curl -fsSL --proto '=https' --tlsv1.2 -o install.sh https://raw.githubusercontent.com/kcepu877/scriptvpn/main/install.sh && chmod +x install.sh && ./install.sh
 ```
 
 ### Standalone API Server Install / Upgrade
 ```bash
-curl -fsSL --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/kcepu877/sc-tunnel/main/install-api.sh | bash
+curl -fsSL --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/kcepu877/scriptvpn/main/install-api.sh | bash
 ```
 
 ### 1-Line Update / Upgrade Command
 ```bash
-curl -fsSL --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/kcepu877/sc-tunnel/main/update.sh | bash
+curl -fsSL --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/kcepu877/scriptvpn/main/update.sh | bash
 ```
 
 ---

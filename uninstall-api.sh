@@ -4,7 +4,7 @@
 # Description: Uninstaller for RESTful API Server only
 # Developed for Rocky Linux 9 / Enterprise Linux
 # License: Apache License 2.0 (see LICENSE file)
-# Repository: https://github.com/kcepu877/sc-tunnel
+# Repository: https://github.com/kcepu877/scriptvpn
 # ========================================================
 
 # Colors
@@ -54,7 +54,7 @@ print_ok "Systemd service removed."
 
 print_info "[3/4] Removing API binaries..."
 rm -f /usr/local/bin/api-server
-rm -f /usr/local/bin/sc-tunnel
+rm -f /usr/local/bin/scriptvpn
 print_ok "Binaries removed."
 
 print_info "[4/4] Removing API database & configurations..."

@@ -3,7 +3,7 @@
 # Project: Autoscript VPN by kcepu877
 # Description: Pure-JSON Xray config management (jq + atomic + rollback)
 # License: Apache License 2.0 (see LICENSE file)
-# Repository: https://github.com/kcepu877/sc-tunnel
+# Repository: https://github.com/kcepu877/scriptvpn
 # ========================================================
 [[ -n "${__AS_XRAYCFG_LOADED:-}" ]] && return 0
 __AS_XRAYCFG_LOADED=1
@@ -26,7 +26,7 @@ cfg_tag() {
 # replace. Rolls back on any failure. Args: jq_filter [jq_args...]
 cfg_apply() {
   local filter="$1"; shift
-  local lockfile="/run/sc-tunnel-xraycfg.lock"
+  local lockfile="/run/scriptvpn-xraycfg.lock"
   mkdir -p /run 2>/dev/null
   (
     flock -w 15 200 || { err "timeout waiting for xray config lock"; exit 1; }

@@ -173,7 +173,7 @@ func ClassifyDomainApp(host string) (appName string, category string) {
 	return clean, "web"
 }
 
-// LoadDNSCacheMap reads the tail of /var/log/sc-tunnel-dns.log (written by dnsmasq-sc-tunnel)
+// LoadDNSCacheMap reads the tail of /var/log/scriptvpn-dns.log (written by dnsmasq-scriptvpn)
 // to build a fast IP -> queried domain map for SSH, Dropbear, SlowDNS, and OpenVPN sessions!
 func LoadDNSCacheMap(dnsLogPath string) map[string]string {
 	ipToDomain := make(map[string]string, 256)

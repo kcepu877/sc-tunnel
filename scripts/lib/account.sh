@@ -3,7 +3,11 @@
 # Project: Autoscript VPN by kcepu877
 # Description: High-level account service (DB + Xray config + system user)
 # License: Apache License 2.0 (see LICENSE file)
+<<<<<<< HEAD
 # Repository: https://github.com/kcepu877/autoscript
+=======
+# Repository: https://github.com/kcepu877/scriptvpn
+>>>>>>> 4f16633 (initial commit)
 # ========================================================
 [[ -n "${__AS_ACCOUNT_LOADED:-}" ]] && return 0
 __AS_ACCOUNT_LOADED=1
@@ -79,7 +83,13 @@ acc_xray_renew() {
   return 0
 }
 
+<<<<<<< HEAD
 # ---- SSH ACCOUNTS ----
+=======
+# ---- SSH ACCOUNTS (Cross-Process flock Coordinated with Go API ShadowMutator) ----
+export AS_SHADOW_LOCK="/run/scriptvpn-shadow.lock"
+
+>>>>>>> 4f16633 (initial commit)
 acc_ssh_create() {
   local user="$1" pass="$2" limit_ip="$3" days="$4" quota_gb="${5:-0}"
   local exp_epoch exp_system quota_bytes=0
@@ -94,13 +104,30 @@ acc_ssh_create() {
   fi
   local nologin
   nologin=$(ensure_nologin_shell); [[ -z "$nologin" ]] && nologin=/usr/sbin/nologin
+<<<<<<< HEAD
   useradd -e "$exp_system" -M -N -s "$nologin" "$user" || { err "useradd failed"; return 1; }
   echo "${user}:${pass}" | chpasswd || { userdel --force "$user" >/dev/null 2>&1; err "chpasswd failed"; return 1; }
+=======
+
+  local lock_rc=0
+  (
+    flock -w 30 9 || exit 1
+    useradd -e "$exp_system" -M -N -s "$nologin" "$user" || exit 1
+    if ! printf '%s:%s\n' "$user" "$pass" | chpasswd -c SHA512 2>/dev/null; then
+      printf '%s:%s\n' "$user" "$pass" | chpasswd || { userdel --force "$user" >/dev/null 2>&1 || true; exit 1; }
+    fi
+  ) 9>"$AS_SHADOW_LOCK" || lock_rc=$?
+
+  if (( lock_rc != 0 )); then
+    err "useradd/chpasswd failed"; return 1
+  fi
+>>>>>>> 4f16633 (initial commit)
   db_insert_account "ssh" "$user" "$pass" "$quota_bytes" "$limit_ip" "$exp_epoch"
   db_audit "create" "ssh" "$user" "ip=${limit_ip} days=${days} quota=${quota_gb}GB"
   return 0
 }
 
+<<<<<<< HEAD
 acc_ssh_delete() {
   local user="$1"
   db_account_exists "ssh" "$user" || { err "account not found"; return 4; }
@@ -108,6 +135,83 @@ acc_ssh_delete() {
   db_set_status "ssh" "$user" "deleted"
   db_audit "delete" "ssh" "$user" ""
   systemctl restart dropbear >/dev/null 2>&1
+=======
+# Terminate active processes/sockets for a single SSH/Dropbear/OpenVPN user
+# WITHOUT restarting dropbear.service (preserving all other connected users).
+acc_ssh_kill_user() {
+  local user="$1"
+  [[ -z "$user" || "$user" == "root" ]] && return 0
+  pkill -KILL -u "$user" 2>/dev/null || true
+
+  # Dropbear forks child processes as root when PermitTTY=no/-w/-g; find child PIDs from auth log
+  local auth_src=""
+  if [[ -s /var/log/secure ]]; then auth_src="/var/log/secure"
+  elif [[ -s /var/log/auth.log ]]; then auth_src="/var/log/auth.log"
+  fi
+  if [[ -n "$auth_src" ]]; then
+    local dpids p
+    dpids=$(tail -n 2000 "$auth_src" 2>/dev/null | awk -v u="'${user}'" '
+      /dropbear\[/ && /Password auth succeeded/ && index($0, u) {
+        pid=$0; sub(/.*dropbear\[/,"",pid); sub(/\].*/,"",pid);
+        if (pid ~ /^[0-9]+$/) print pid
+      }
+    ' | sort -u)
+    for p in $dpids; do
+      # Never kill master listener PID (PPID 1)
+      local ppid comm
+      ppid=$(awk '/^PPid:/ {print $2}' "/proc/${p}/status" 2>/dev/null)
+      comm=$(cat "/proc/${p}/comm" 2>/dev/null)
+      if [[ "$comm" == "dropbear" && -n "$ppid" && "$ppid" != "1" ]]; then
+        kill -9 "$p" 2>/dev/null || true
+      fi
+    done
+  fi
+}
+
+acc_ssh_delete() {
+  local user="$1"
+  db_account_exists "ssh" "$user" || { err "account not found"; return 4; }
+  acc_ssh_kill_user "$user"
+  (
+    flock -w 30 9 || exit 0
+    id "$user" &>/dev/null && userdel --force "$user" >/dev/null 2>&1 || true
+  ) 9>"$AS_SHADOW_LOCK"
+  db_set_status "ssh" "$user" "deleted"
+  db_audit "delete" "ssh" "$user" ""
+  return 0
+}
+
+acc_ssh_suspend() {
+  local user="$1" reason="${2:-quota}"
+  db_account_exists "ssh" "$user" || return 4
+  (
+    flock -w 30 9 || exit 0
+    if id "$user" &>/dev/null; then
+      usermod -L "$user" >/dev/null 2>&1 || true
+      chage -E 0 "$user" >/dev/null 2>&1 || true
+    fi
+  ) 9>"$AS_SHADOW_LOCK"
+  acc_ssh_kill_user "$user"
+  db_set_status "ssh" "$user" "suspended"
+  db_audit "suspend" "ssh" "$user" "$reason"
+  return 0
+}
+
+acc_ssh_unsuspend() {
+  local user="$1"
+  local exp_epoch
+  exp_epoch=$(db_query "SELECT expired_at FROM accounts WHERE protocol='ssh' AND username='$(sql_escape "$user")' AND status!='deleted' LIMIT 1;")
+  [[ -z "$exp_epoch" ]] && return 4
+  (
+    flock -w 30 9 || exit 0
+    if id "$user" &>/dev/null; then
+      usermod -U "$user" >/dev/null 2>&1 || true
+      chage -E "$(date -d "@${exp_epoch}" +%Y-%m-%d)" "$user" >/dev/null 2>&1 || true
+    fi
+  ) 9>"$AS_SHADOW_LOCK"
+  db_set_status "ssh" "$user" "active"
+  db_audit "unsuspend" "ssh" "$user" ""
+>>>>>>> 4f16633 (initial commit)
   return 0
 }
 
@@ -120,7 +224,17 @@ acc_ssh_renew() {
   base=$cur; (( cur < now )) && base=$now
   new=$(( base + days * 86400 ))
   db_set_expired "ssh" "$user" "$new"
+<<<<<<< HEAD
   id "$user" &>/dev/null && chage -E "$(date -d "@${new}" +%Y-%m-%d)" "$user" 2>/dev/null
+=======
+  (
+    flock -w 30 9 || exit 0
+    if id "$user" &>/dev/null; then
+      usermod -U "$user" 2>/dev/null || true
+      chage -E "$(date -d "@${new}" +%Y-%m-%d)" "$user" 2>/dev/null || true
+    fi
+  ) 9>"$AS_SHADOW_LOCK"
+>>>>>>> 4f16633 (initial commit)
   db_audit "renew" "ssh" "$user" "+${days}d"
   echo "$new"
   return 0
@@ -238,7 +352,11 @@ noobz_print_cli() {
   ui_kv "Port TCP"     "8585"
   ui_kv "Port HTTP"    "80, 8080"
   ui_kv "Port TLS"     "443"
+<<<<<<< HEAD
   ui_kv "Identifier"   "vvip"
+=======
+  ui_kv "Identifier"   "kcepu877"
+>>>>>>> 4f16633 (initial commit)
   ui_kv "Path"         "/noobz"
   ui_rule
   echo -e " ${WHITE}Payload (WS) :${NC}"
@@ -269,7 +387,11 @@ noobz_tg_text() {
 <b>Port TCP     :</b> <code>8585</code>
 <b>Port HTTP    :</b> <code>80, 8080</code>
 <b>Port TLS     :</b> <code>443</code>
+<<<<<<< HEAD
 <b>Identifier   :</b> <code>vvip</code>
+=======
+<b>Identifier   :</b> <code>kcepu877</code>
+>>>>>>> 4f16633 (initial commit)
 <b>Path         :</b> <code>/noobz</code>
 <b>━━━━━━━━━━━━━━━━━━━━━━━━━━━</b>
 <b>Payload :</b>
@@ -305,6 +427,7 @@ ssh_print_cli() {
   ui_kv "Limit IP"  "$ip_disp"
   ui_kv "Expired"   "$exp_disp"
   ui_rule
+<<<<<<< HEAD
   ui_kv "OpenSSH"   "22, 109"
   ui_kv "WS HTTP"   "80, 8888"
   ui_kv "WS TLS"    "443"
@@ -312,6 +435,16 @@ ssh_print_cli() {
   ui_kv "Squid"     "3128"
   ui_kv "BadVPN"    "7300 (UDPGW)"
   ui_kv "OpenVPN"   "1194 (TCP)"
+=======
+  ui_kv "OpenSSH"   "22, 3303"
+  ui_kv "Dropbear"  "109, 143"
+  ui_kv "WS HTTP"   "80, 8080, 8888"
+  ui_kv "WS TLS"    "443, 8443"
+  ui_kv "SSH SSL"   "443, 8443"
+  ui_kv "Squid"     "3128"
+  ui_kv "BadVPN"    "7300 (UDPGW)"
+  ui_kv "OpenVPN"   "1194 (TCP/UDP)"
+>>>>>>> 4f16633 (initial commit)
   if [[ -s /etc/slowdns/server.pub && -s /etc/slowdns/nameserver ]]; then
     local dns_ns; dns_ns=$(cat /etc/slowdns/nameserver 2>/dev/null | tr -d '\r\n')
     local dns_pub; dns_pub=$(cat /etc/slowdns/server.pub 2>/dev/null | tr -d '\r\n')
@@ -328,7 +461,11 @@ ssh_print_cli() {
   echo -e " ${WHITE}Payload (WS) :${NC}"
   echo -e " ${GREEN}GET /ssh HTTP/1.1[crlf]Host: ${d}[crlf]Upgrade: websocket[crlf][crlf]${NC}"
   ui_rule
+<<<<<<< HEAD
   ui_kv "OVPN TCP"    "https://${d}/vvip/openvpn/tcp.ovpn"
+=======
+  ui_kv "OVPN TCP"    "https://${d}/kcepu877/openvpn/tcp.ovpn"
+>>>>>>> 4f16633 (initial commit)
   ui_foot
 }
 
@@ -369,6 +506,7 @@ ssh_tg_text() {
 <b>Limit IP  :</b> <code>${ip_disp}</code>
 <b>Expired   :</b> <code>${exp_disp}</code>
 <b>━━━━━━━━━━━━━━━━━━━━━━━━━━━</b>
+<<<<<<< HEAD
 <b>Port OpenSSH :</b> <code>22, 109</code>
 <b>Port WS HTTP :</b> <code>80, 8888</code>
 <b>Port WS TLS  :</b> <code>443</code>
@@ -376,6 +514,16 @@ ssh_tg_text() {
 <b>Port Squid   :</b> <code>3128</code>
 <b>Port BadVPN  :</b> <code>7300</code>
 <b>Port OpenVPN :</b> <code>1194 (TCP)</code>${slowdns_tg}
+=======
+<b>Port OpenSSH :</b> <code>22, 3303</code>
+<b>Port Dropbear:</b> <code>109, 143</code>
+<b>Port WS HTTP :</b> <code>80, 8080, 8888</code>
+<b>Port WS TLS  :</b> <code>443, 8443</code>
+<b>Port SSH SSL :</b> <code>443, 8443</code>
+<b>Port Squid   :</b> <code>3128</code>
+<b>Port BadVPN  :</b> <code>7300</code>
+<b>Port OpenVPN :</b> <code>1194 (TCP/UDP)</code>${slowdns_tg}
+>>>>>>> 4f16633 (initial commit)
 <b>━━━━━━━━━━━━━━━━━━━━━━━━━━━</b>
 <b>Config HTTP Custom :</b>
 <code>${d}:1-65535@${user}:${pass}</code>
@@ -383,7 +531,11 @@ ssh_tg_text() {
 <b>Payload :</b>
 <code>GET /ssh HTTP/1.1[crlf]Host: ${d}[crlf]Upgrade: websocket[crlf][crlf]</code>
 <b>━━━━━━━━━━━━━━━━━━━━━━━━━━━</b>
+<<<<<<< HEAD
 <b>OVPN TCP :</b> <code>https://${d}/vvip/openvpn/tcp.ovpn</code>
+=======
+<b>OVPN TCP :</b> <code>https://${d}/kcepu877/openvpn/tcp.ovpn</code>
+>>>>>>> 4f16633 (initial commit)
 <b>━━━━━━━━━━━━━━━━━━━━━━━━━━━</b>
 EOF
 }
@@ -531,6 +683,7 @@ xray_user_bytes() {
 # Arg: protocol (vless|vmess|trojan)
 xray_account_proto() {
   local proto="$1" user quota used delta
+<<<<<<< HEAD
   while IFS='|' read -r user quota used; do
     [[ -z "$user" ]] && continue
     delta=$(xray_user_bytes "$user" reset)
@@ -547,16 +700,68 @@ xray_account_proto() {
     fi
   done < <(db_query "SELECT username, quota_bytes, used_bytes FROM accounts
                      WHERE protocol='${proto}' AND status='active';")
+=======
+  local xb="${AS_XRAY_BIN:-xray}"; [[ -x "$xb" ]] || xb="xray"
+
+  # Pre-fetch non-zero user traffic counters in 1 single statsquery call (no reset yet)
+  # so idle accounts cost zero subprocess forks on 1-vCPU VPS nodes.
+  declare -A NONZERO_USERS=()
+  local sq_out u_name u_val
+  sq_out=$("$xb" api statsquery --server="$XRAY_API" -pattern "user>>>" 2>/dev/null)
+  if [[ -n "$sq_out" ]] && command -v jq >/dev/null 2>&1; then
+    while IFS='|' read -r u_name u_val; do
+      [[ -n "$u_name" && "$u_val" =~ ^[0-9]+$ ]] && (( u_val > 0 )) && NONZERO_USERS[$u_name]=1
+    done < <(echo "$sq_out" | jq -r '.stat[]? | select(.value != null and (.value|tonumber) > 0) | ((.name | split(">>>")[1]) + "|" + (.value|tostring))' 2>/dev/null)
+  fi
+
+  local sql_batch=""
+  local -a to_suspend=()
+
+  while IFS='|' read -r user quota used; do
+    [[ -z "$user" ]] && continue
+    delta=0
+    if [[ ${#NONZERO_USERS[@]} -eq 0 && -z "$sq_out" ]]; then
+      # Fallback if statsquery output format differed
+      delta=$(xray_user_bytes "$user" reset)
+    elif [[ -n "${NONZERO_USERS[$user]:-}" ]]; then
+      delta=$(xray_user_bytes "$user" reset)
+    fi
+
+    if [[ "$delta" =~ ^[0-9]+$ ]] && (( delta > 0 )); then
+      sql_batch+="UPDATE accounts SET used_bytes = used_bytes + ${delta}, updated_at = strftime('%s','now') WHERE protocol='${proto}' AND username='$(sql_escape "$user")';"$'\n'
+      used=$(( ${used:-0} + delta ))
+    fi
+
+    if [[ "$quota" =~ ^[0-9]+$ ]] && (( quota > 0 )) && (( used >= quota )); then
+      to_suspend+=("$user")
+    fi
+  done < <(db_query "SELECT username, quota_bytes, used_bytes FROM accounts
+                     WHERE protocol='${proto}' AND status='active';")
+
+  if [[ -n "$sql_batch" ]]; then
+    db_exec "BEGIN TRANSACTION;"$'\n'"${sql_batch}COMMIT;"
+  fi
+
+  for user in "${to_suspend[@]}"; do
+    acc_xray_suspend "$proto" "$user" "quota"
+    tg_send "<b>[ ${proto^^} QUOTA EXCEEDED ]</b>%0AUsername: <code>${user}</code>%0AStatus: suspended"
+  done
+>>>>>>> 4f16633 (initial commit)
 }
 
 # Boxed per-account login monitor for an xray protocol.
 # Counts distinct CLIENT IPs seen in the most recent login window so a single
+<<<<<<< HEAD
 # client that reconnected several times is not counted multiple times.
 #
 # Xray access-log line format:
 #   2026/06/10 19:02:02.376558 from 160.191.130.65:0 accepted tcp:host:port [tag] email: user
 # The client IP is the token AFTER "from" (field $4 here), NOT $3 (which is the
 # literal word "from"). The earlier code read $3 and printed "from" as the IP.
+=======
+# client that reconnected several times is not counted multiple times, and shows
+# exact transport protocol, ISP, GeoIP location, and accessed apps/domains.
+>>>>>>> 4f16633 (initial commit)
 # Arg: protocol (vless|vmess|trojan)
 xray_cek_monitor() {
   local proto="$1"
@@ -566,24 +771,35 @@ xray_cek_monitor() {
   clear
   ui_header "${proto^^} LOGIN MONITOR"
 
+<<<<<<< HEAD
   # Build "epoch threshold" once. awk compares the log timestamp (converted to
   # epoch via mktime) against this, so we never spawn a `date` per line.
+=======
+>>>>>>> 4f16633 (initial commit)
   local cutoff; cutoff=$(date +%s)
 
   local any=0
   while IFS='|' read -r user limit qb used exp; do
     [[ -z "$user" ]] && continue
 
+<<<<<<< HEAD
     # Distinct client IPs from RECENT accepted log lines for this user.
     local ips cnt
     ips=$(awk -v u="email: ${user}" -v cutoff="$cutoff" -v win="$RECENT_SECS" '
       index($0, u) && /accepted/ {
         # $1=YYYY/MM/DD  $2=HH:MM:SS(.micros)
+=======
+    # Distinct client IPs + inbound transport tags from RECENT accepted log lines
+    local parsed ips tags cnt
+    parsed=$(tail -n 4000 "$LOG" 2>/dev/null | awk -v u="email: ${user}" -v cutoff="$cutoff" -v win="$RECENT_SECS" '
+      index($0, u) && /accepted/ {
+>>>>>>> 4f16633 (initial commit)
         split($1, d, "/");
         t=$2; sub(/\..*/, "", t); split(t, c, ":");
         ep=mktime(d[1]" "d[2]" "d[3]" "c[1]" "c[2]" "c[3]);
         if (ep <= 0) next;
         if (cutoff - ep <= win) {
+<<<<<<< HEAD
           # client IP = token after the word "from"
           for (i=1; i<=NF; i++) if ($i=="from") { ipp=$(i+1); break }
           sub(/:[0-9]+$/, "", ipp);          # strip :port
@@ -602,6 +818,32 @@ xray_cek_monitor() {
     # Display values. Usage = persisted used_bytes + live (un-reset) counter,
     # so the figure is accurate immediately, even between quota-daemon polls.
     local limd usedd quotad ipcol live used_total
+=======
+          ipp=""; tag="";
+          for (i=1; i<=NF; i++) {
+            if ($i=="from" && (i+1)<=NF) ipp=$(i+1);
+            if ($i ~ /^\[.*\]$/) { tag=$i; gsub(/^\[|\]$/, "", tag); }
+          }
+          sub(/:[0-9]+$/, "", ipp);
+          if (ipp ~ /^[0-9a-fA-F:.]+$/ && ipp != "" && ipp != "127.0.0.1") seen_ip[ipp]=1;
+          if (tag != "" && tag != "api") seen_tag[tag]=1;
+        }
+      }
+      END {
+        for (k in seen_ip) print "IP|" k;
+        for (t in seen_tag) print "TAG|" t;
+      }
+    ' 2>/dev/null)
+
+    ips=$(printf '%s\n' "$parsed" | awk -F'|' '$1=="IP"{print $2}' | sort -u)
+    tags=$(printf '%s\n' "$parsed" | awk -F'|' '$1=="TAG"{print $2}' | sort -u | paste -sd ', ' -)
+
+    cnt=0
+    [[ -n "$ips" ]] && cnt=$(printf '%s\n' "$ips" | grep -c .)
+    [[ "$cnt" -le 0 ]] && continue
+
+    local limd usedd quotad ipcol live used_total apps_used
+>>>>>>> 4f16633 (initial commit)
     live=$(xray_user_bytes "$user")
     used_total=$(( ${used:-0} + ${live:-0} ))
     [[ "$limit" == "0" ]] && limd="Unlimited" || limd="$limit"
@@ -609,13 +851,26 @@ xray_cek_monitor() {
     if [[ "$qb" == "0" ]]; then quotad="Unlimited"; else quotad=$(human_bytes "$qb"); fi
     ipcol="$GREEN"
     if [[ "$limd" != "Unlimited" && "$cnt" -gt "$limit" ]]; then ipcol="$RED"; fi
+<<<<<<< HEAD
+=======
+    [[ -z "$tags" ]] && tags="${proto}-ws"
+    apps_used=$(detect_xray_user_apps "$user")
+>>>>>>> 4f16633 (initial commit)
 
     any=1
     ui_rule
     ui_kv "Username" "$user" "$CYAN"
+<<<<<<< HEAD
     ui_kv "Login IP" "${cnt} / ${limd} IP" "$ipcol"
     ui_kv "Bandwidth" "${usedd} / ${quotad}"
     ui_kv "Expired" "$exp"
+=======
+    ui_kv "Protocol" "${tags^^}" "$PINK"
+    ui_kv "Login IP" "${cnt} / ${limd} IP" "$ipcol"
+    ui_kv "Bandwidth" "${usedd} / ${quotad}"
+    ui_kv "Expired" "$exp"
+    [[ -n "$apps_used" ]] && ui_kv "Apps/Domain" "$apps_used" "$YELLOW"
+>>>>>>> 4f16633 (initial commit)
     printf " ${WHITE}%-12s${NC} :\n" "Active IPs"
     while read -r one; do
       [[ -z "$one" ]] && continue

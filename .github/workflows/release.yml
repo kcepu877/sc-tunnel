@@ -28,7 +28,7 @@ on:
           - 'true'
 
 env:
-  APP_NAME: sc-tunnel
+  APP_NAME: scriptvpn
 
 permissions:
   contents: write
@@ -83,7 +83,7 @@ jobs:
             echo "## Autoscript Enterprise Release ${TAG}"
             echo ""
             echo "### Highlights"
-            echo "- **Prebuilt Hardened Binaries (Zero VPS Compile Time)**: Static \`Dropbear 2019.78\` (\`dropbear\` + \`dropbearkey\` with EL9 \`\$6\$\` SHA-512 & EL10 \`\$y\$\` YESCRYPT + SSRF/IMDS guard + shadow expiry enforcement), \`dnstt-server\` (SlowDNS), and \`sc-tunnel\` (\`amd64\` & \`arm64\`)"
+            echo "- **Prebuilt Hardened Binaries (Zero VPS Compile Time)**: Static \`Dropbear 2019.78\` (\`dropbear\` + \`dropbearkey\` with EL9 \`\$6\$\` SHA-512 & EL10 \`\$y\$\` YESCRYPT + SSRF/IMDS guard + shadow expiry enforcement), \`dnstt-server\` (SlowDNS), and \`scriptvpn\` (\`amd64\` & \`arm64\`)"
             echo "- **Multi-Distro Enterprise Linux 9 & 10 Support**: Rocky Linux 9–10, RHEL 9–10, AlmaLinux 9–10, Oracle Linux 9–10"
             echo "- **Zero-Downtime High-Concurrency Order Engine**: Group-commit Xray config coalescing, cross-process \`flock\` batch \`/etc/shadow\` mutator, and SQLite WAL \`busy_timeout(15000)\` handle 100+ simultaneous orders without lock contention"
             echo "- **Complete Standard REST Endpoints**: Create (single & Flash-Sale bulk), Delete, Renew, and Auto-Detect User Login (\`GET /api/users/{username}/login\` & \`GET /api/users/{username}\`) across all SSH/OpenVPN/Xray/NoobzVPN protocols"

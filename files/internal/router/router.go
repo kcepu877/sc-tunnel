@@ -5,10 +5,10 @@ import (
 	"time"
 
 	"github.com/fasthttp/router"
-	"github.com/kcepu877/sc-tunnel/internal/config"
-	"github.com/kcepu877/sc-tunnel/internal/handler"
-	"github.com/kcepu877/sc-tunnel/internal/middleware"
-	"github.com/kcepu877/sc-tunnel/internal/model"
+	"github.com/kcepu877/scriptvpn/internal/config"
+	"github.com/kcepu877/scriptvpn/internal/handler"
+	"github.com/kcepu877/scriptvpn/internal/middleware"
+	"github.com/kcepu877/scriptvpn/internal/model"
 	"github.com/valyala/fasthttp"
 )
 

@@ -95,8 +95,13 @@ func Load() (*Config, error) {
 		XrayAccessLog:    getEnv("XRAY_ACCESS_LOG", "/var/log/xray/access.log"),
 		XrayAPIAddress:   getEnv("XRAY_API", "127.0.0.1:10085"),
 		SSHWSAPI:         strings.TrimRight(getEnv("SSH_WS_API", "http://127.0.0.1:8081"), "/"),
+<<<<<<< HEAD
 		DNSLogFile:       getEnv("DNS_LOG_FILE", "/var/log/autoscript-dns.log"),
 		GeoIPCacheFile:   getEnv("GEOIP_CACHE_FILE", "/run/autoscript-geoip.cache"),
+=======
+		DNSLogFile:       getEnv("DNS_LOG_FILE", "/var/log/scriptvpn-dns.log"),
+		GeoIPCacheFile:   getEnv("GEOIP_CACHE_FILE", "/run/scriptvpn-geoip.cache"),
+>>>>>>> 4f16633 (initial commit)
 		BackupKeyFile:    getEnv("BACKUP_KEY_FILE", "/etc/xray/backup.pass"),
 		ChatIDFile:       getEnv("CHATID_FILE", "/etc/xray/client.id"),
 		RateLimit:        getEnvInt("RATE_LIMIT", 5000),

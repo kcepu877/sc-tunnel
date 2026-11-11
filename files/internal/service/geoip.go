@@ -14,7 +14,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/kcepu877/sc-tunnel/internal/model"
+	"github.com/kcepu877/scriptvpn/internal/model"
 )
 
 type cachedGeo struct {
@@ -23,7 +23,7 @@ type cachedGeo struct {
 }
 
 // GeoIPResolver resolves client IP addresses to ISP/ASN and geographic location using free APIs
-// (ip-api.com batch -> ipwho.is -> freeipapi.com) with 24h RAM caching and /run/sc-tunnel-geoip.cache sync.
+// (ip-api.com batch -> ipwho.is -> freeipapi.com) with 24h RAM caching and /run/scriptvpn-geoip.cache sync.
 type GeoIPResolver struct {
 	mu        sync.RWMutex
 	cache     map[string]cachedGeo
